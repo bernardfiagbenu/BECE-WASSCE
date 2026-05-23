@@ -2,10 +2,9 @@
   "name": "computing-quiz",
   "version": "1.0.0",
   "description": "Computing Quiz Application",
-  "main": "index.html",
   "scripts": {
-    "build": "node node_modules/tailwindcss/lib/cli.js -i ./src/input.css -o ./dist/output.css",
-    "build:prod": "node node_modules/tailwindcss/lib/cli.js -i ./src/input.css -o ./dist/output.css --minify",
+    "build": "npx tailwindcss -i ./src/input.css -o ./dist/output.css",
+    "build:prod": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
     "dev": "node start-dev.js",
     "start": "node server.js",
     "lint": "echo 'Linting successful'"
