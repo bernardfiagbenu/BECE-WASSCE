@@ -26,6 +26,11 @@ const server = http.createServer((req, res) => {
   // Normalize and parse URL path, removing query params and trailing slashes
   let urlPath = req.url.split('?')[0];
   
+  // Strip trailing slash if it's not the root path
+  if (urlPath !== '/' && urlPath.endsWith('/')) {
+    urlPath = urlPath.slice(0, -1);
+  }
+  
   // Default fallback to index.html for root or empty path
   if (urlPath === '/' || urlPath === '') {
     urlPath = '/index.html';
