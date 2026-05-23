@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXAM - BECE Year Selection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        courseraBlue: '#0056D2',
+                        courseraDarkBlue: '#00419E'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .year-card {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .year-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 86, 210, 0.08);
+        }
+        
+        .dark .year-card:hover {
+            box-shadow: 0 12px 24px rgba(96, 165, 250, 0.15);
+        }
+
+        .ticker-container { position: relative; overflow: hidden; }
+        .ticker-track { display: flex; width: max-content; animation: ticker-scroll 35s linear infinite; }
+        .ticker-item { white-space: nowrap; padding: 0 1.25rem; border-right: 1px solid rgba(0,0,0,0.08); }
+        .dark .ticker-item { border-right-color: rgba(255,255,255,0.1); }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body class="font-inter bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 min-h-screen">
+    <div class="flex flex-col min-h-screen">
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-3">
+                        <a href="index.html" class="flex items-center space-x-2">
+                            <div class="bg-[#0056D2] rounded px-3 py-1.5 text-white font-extrabold text-lg tracking-wider shadow-sm">
+                                EXAM
+                            </div>
+                            <span class="text-lg font-bold text-slate-800 dark:text-white hidden sm:block">BECE Year Selection</span>
+                        </a>
+                        <nav class="hidden md:flex space-x-4 border-l border-slate-200 dark:border-slate-700 pl-4 ml-4">
+                            <a href="index.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0056D2] dark:hover:text-blue-400 transition-colors">Exam Portal</a>
+                            <a href="news.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0056D2] dark:hover:text-blue-400 transition-colors">News Updates</a>
+                            <a href="chat.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0056D2] dark:hover:text-blue-400 transition-colors">AI Tutor Chat</a>
+                        </nav>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2 md:hidden">
+                            <a href="news.html" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#0056D2] px-2 py-1">News</a>
+                            <a href="chat.html" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#0056D2] px-2 py-1">AI Chat</a>
+                        </div>
+                        
+                        <button id="theme-toggle" class="p-2 ml-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 focus:outline-none transition-colors" aria-label="Toggle Theme">
+                            <svg id="sun-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Live Rankings Tracker</span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                        Live
+                    </span>
+                </div>
+                <span class="text-[10px] text-slate-400 italic">Scores update in real time</span>
+            </div>
+            <div id="rankings-ticker" class="ticker-container bg-slate-100 dark:bg-slate-950/40" style="width:100%;">
+                <div id="ticker-dup" class="flex flex-row">
+                    <div id="ticker-track-a" class="ticker-track py-2 text-xs text-slate-600 dark:text-slate-300"></div>
+                    <div id="ticker-track-b" class="ticker-track py-2 text-xs text-slate-600 dark:text-slate-300"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex items-center justify-center py-6 sm:py-16">
+            <div class="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header Section -->
+                <div class="text-center mb-8 sm:mb-12">
+                    <div class="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4 sm:mb-6 border border-blue-100 dark:border-blue-900">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#0056D2] dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-3">Select Academic Year</h2>
+                    <p class="text-sm sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+                        Choose the specific BECE academic year to view syllabus, subjects list, active practice tests, and simulated exam resources.
+                    </p>
+                </div>
+                
+                <!-- Year Selection Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 max-w-2xl mx-auto">
+                    <!-- 2024 Year Card -->
+                    <div class="year-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 sm:p-8 cursor-pointer hover:border-[#0056D2]" onclick="selectYear('2024')">
+                        <div class="text-center">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-[#0056D2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-950 dark:text-white mb-2">2024</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 sm:mb-6">Previous academic year materials and comprehensive past computed quizzes.</p>
+                            <div class="flex items-center justify-center text-[#0056D2] dark:text-blue-400">
+                                <span class="text-xs sm:text-sm font-semibold">Select 2024 Materials</span>
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2025 Year Card -->
+                    <div class="year-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 sm:p-8 cursor-pointer hover:border-green-500" onclick="selectYear('2025')">
+                        <div class="text-center">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-950 dark:text-white mb-2">2025</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 sm:mb-6">Current active academic year with updated structural WAEC model exams.</p>
+                            <div class="flex items-center justify-center text-green-600 dark:text-green-400">
+                                <span class="text-xs sm:text-sm font-semibold">Select 2025 Materials</span>
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Back Button -->
+                <div class="text-center mt-8 sm:mt-12">
+                    <button onclick="goBack()" class="inline-flex items-center px-4 py-2 border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-800 transition-all text-sm shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Back to Exam Selection
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 sm:py-8 mt-12 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">
+                        &copy; 2026 <span class="font-bold text-[#0056D2] dark:text-blue-400">EXAM Prep Portal</span>. Learn without limits.
+                    </span>
+                </div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 sm:text-right">
+                    Developed by 
+                    <a href="https://bernardfiagbenu-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" class="font-semibold text-[#0056D2] dark:text-blue-400 hover:underline">
+                        Bernard Fiagbenu
+                    </a>, 
+                    <span class="italic">Computing Instructor at Unique Child</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Ensure robust guest User Session at very first load
+        function ensureGuestCredentials() {
+            let userData = localStorage.getItem('userData');
+            if (!userData) {
+                userData = JSON.stringify({
+                    uid: "guest_" + Math.random().toString(36).substr(2, 9),
+                    displayName: "Guest Student",
+                    phone: "+233000000000",
+                    school: "Ghanaian Student"
+                });
+                localStorage.setItem('userData', userData);
+            }
+            return JSON.parse(userData);
+        }
+
+        // Theme management
+        function initTheme() {
+            let savedTheme = localStorage.getItem('theme');
+            if (!savedTheme) {
+                savedTheme = 'light';
+                localStorage.setItem('theme', 'light');
+            }
+            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+            updateThemeIcons(savedTheme === 'dark');
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons(isDark);
+            
+            // Add visual feedback for theme change
+            const body = document.body;
+            body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+            
+            // Force a repaint to ensure smooth transition
+            setTimeout(() => {
+                body.style.transition = '';
+            }, 300);
+        }
+
+        function updateThemeIcons(isDark) {
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (sunIcon && moonIcon) {
+                if (isDark) {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                } else {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            }
+        }
+
+        // Year selection
+        function selectYear(year) {
+            // Store selected year
+            localStorage.setItem('selectedYear', year);
+            
+            // Redirect to subject selection page
+            window.location.href = 'subject-select.html';
+        }
+
+        // Navigation
+        function goBack() {
+            window.location.href = 'exam-select.html';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            ensureGuestCredentials();
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+        });
+    </script>
+
+    <!-- Realtime Rankings Ticker (Firebase) -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPQxZvBmsJQ4kGxnWWBPs1pwRZnB8i3VE",
+            authDomain: "g00gleauthen-2afqo4.firebaseapp.com",
+            projectId: "g00gleauthen-2afqo4",
+            storageBucket: "g00gleauthen-2afqo4.appspot.com",
+            messagingSenderId: "151985888576",
+            appId: "1:151985888576:web:g00gleauthen-2afqo4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const tickerA = document.getElementById('ticker-track-a');
+        const tickerB = document.getElementById('ticker-track-b');
+        const ticker = document.getElementById('rankings-ticker');
+
+        function renderTicker(users) {
+            const items = users.map((u, i) => {
+                const name = (u.displayName || 'Student').toString().slice(0, 18);
+                const score = u.totalScore || 0;
+                const quizzes = u.quizzesTaken || 0;
+                return `<span class="ticker-item"><span class="text-gray-500">#${i+1}</span> <span class="font-semibold">${name}</span> — ${score} pts, ${quizzes} quizzes</span>`;
+            }).join('');
+            if (tickerA) tickerA.innerHTML = items;
+            if (tickerB) tickerB.innerHTML = items;
+        }
+
+        function initTickerUI() {}
+
+        const qTop = query(collection(db, 'users'), orderBy('totalScore', 'desc'), limit(20));
+        onSnapshot(qTop, (snap) => {
+            const users = snap.docs.map(d => d.data());
+            renderTicker(users);
+        }, () => {
+            // fallback: hide on error
+            if (ticker) ticker.classList.add('hidden');
+        });
+    </script>
+    
+    <!-- AI Chatbot Script -->
+    <script src="ai-chatbot.js"></script>
+</body>
+</html>

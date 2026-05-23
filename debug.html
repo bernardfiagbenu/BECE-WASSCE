@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - AI Chatbot & TTS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .debug-item { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; color: #856404; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Debug: AI Chatbot & TTS</h1>
+        
+        <div id="debug-results" class="space-y-4">
+            <div class="debug-item">
+                <strong>Loading...</strong>
+            </div>
+        </div>
+        
+        <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded">
+            <h2 class="text-xl font-semibold mb-2">Instructions:</h2>
+            <ol class="list-decimal list-inside space-y-1">
+                <li>Open browser console (F12)</li>
+                <li>Check for any error messages</li>
+                <li>Look for "AI Chatbot loaded successfully" message</li>
+                <li>Test the chatbot button in bottom-right corner</li>
+                <li>If issues persist, check the debug results above</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- AI Chatbot Script -->
+    <script src="ai-chatbot.js"></script>
+    
+    <script>
+        const debugResults = document.getElementById('debug-results');
+        
+        function addDebugItem(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `debug-item ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            debugResults.appendChild(div);
+        }
+        
+        // Test AI Chatbot
+        function testAIChatbot() {
+            addDebugItem('Testing AI Chatbot...', 'warning');
+            
+            if (typeof AIChatbot !== 'undefined') {
+                addDebugItem('✅ AIChatbot object found', 'success');
+                
+                if (typeof AIChatbot.init === 'function') {
+                    addDebugItem('✅ AIChatbot.init function available', 'success');
+                } else {
+                    addDebugItem('❌ AIChatbot.init function not found', 'error');
+                }
+                
+                if (typeof AIChatbot.toggleChat === 'function') {
+                    addDebugItem('✅ AIChatbot.toggleChat function available', 'success');
+                } else {
+                    addDebugItem('❌ AIChatbot.toggleChat function not found', 'error');
+                }
+            } else {
+                addDebugItem('❌ AIChatbot object not found', 'error');
+            }
+        }
+        
+        // Test TTS
+        function testTTS() {
+            addDebugItem('Testing TTS...', 'warning');
+            
+            if ('speechSynthesis' in window) {
+                addDebugItem('✅ Web Speech API available', 'success');
+                
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    addDebugItem(`✅ ${voices.length} voices available`, 'success');
+                } else {
+                    addDebugItem('⚠️ No voices loaded yet', 'warning');
+                }
+            } else {
+                addDebugItem('❌ Web Speech API not available', 'error');
+            }
+        }
+        
+        // Test file loading
+        function testFileLoading() {
+            addDebugItem('Testing file loading...', 'warning');
+            
+            // Test if ai-chatbot.js loaded
+            const scripts = document.querySelectorAll('script[src*="ai-chatbot.js"]');
+            if (scripts.length > 0) {
+                addDebugItem('✅ ai-chatbot.js script tag found', 'success');
+            } else {
+                addDebugItem('❌ ai-chatbot.js script tag not found', 'error');
+            }
+        }
+        
+        // Test browser compatibility
+        function testBrowserCompatibility() {
+            addDebugItem('Testing browser compatibility...', 'warning');
+            
+            const userAgent = navigator.userAgent;
+            addDebugItem(`Browser: ${userAgent}`, 'info');
+            
+            if (userAgent.includes('Chrome')) {
+                addDebugItem('✅ Chrome detected - should work well', 'success');
+            } else if (userAgent.includes('Firefox')) {
+                addDebugItem('✅ Firefox detected - should work well', 'success');
+            } else if (userAgent.includes('Safari')) {
+                addDebugItem('⚠️ Safari detected - may have TTS issues', 'warning');
+            } else if (userAgent.includes('Edge')) {
+                addDebugItem('✅ Edge detected - should work well', 'success');
+            } else {
+                addDebugItem('⚠️ Unknown browser - may have compatibility issues', 'warning');
+            }
+        }
+        
+        // Run all tests
+        function runAllTests() {
+            addDebugItem('Starting debug tests...', 'info');
+            
+            setTimeout(() => {
+                testFileLoading();
+                testBrowserCompatibility();
+                testTTS();
+                testAIChatbot();
+                
+                addDebugItem('Debug tests completed. Check console for more details.', 'info');
+            }, 1000);
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runAllTests);
+        
+        // Also run tests after a delay to catch late loading
+        setTimeout(runAllTests, 3000);
+    </script>
+</body>
+</html>

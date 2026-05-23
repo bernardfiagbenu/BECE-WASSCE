@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXAM - Chat</title>
+
+    <script>
+        // Tailwind CDN config: enable class-based dark mode
+        window.tailwind = window.tailwind || {};
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- PWA basics -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chat-container { height: calc(100vh - 200px); }
+        .messages-container { height: calc(100% - 120px); }
+        .message-bubble { max-width: 70%; word-wrap: break-word; }
+        .message-bubble.sent { background: #3b82f6; color: white; }
+        .message-bubble.received { background: #f3f4f6; color: #1f2937; }
+        .dark .message-bubble.received { background: #374151; color: #f9fafb; }
+        .typing-indicator { display: none; }
+        .typing-indicator.active { display: block; }
+        .online-indicator { width: 8px; height: 8px; border-radius: 50%; }
+        .online-indicator.online { background: #10b981; }
+        .online-indicator.offline { background: #6b7280; }
+        
+        /* Mobile Navigation Icons - Bigger in mobile view */
+        @media (max-width: 768px) {
+            .mobile-nav-icon {
+                padding: 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .mobile-nav-icon svg {
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+            }
+            
+            .mobile-nav-icon:hover {
+                background-color: rgba(59, 130, 246, 0.1) !important;
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <div class="bg-[#0056D2] rounded px-3 py-1.5 text-white font-extrabold text-lg tracking-wider shadow-sm">
+                            EXAM
+                        </div>
+                        <span class="text-lg font-bold text-slate-800 dark:text-white hidden sm:block">AI Tutor Chat</span>
+                    </a>
+                    <span class="text-slate-200 dark:text-slate-800">|</span>
+                    <div class="flex items-center space-x-2">
+                        <a href="news.html" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:text-[#0056D2] px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 mobile-nav-icon font-medium">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                            </svg>
+                            News
+                        </a>
+                        <a href="exam-select.html" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 hover:text-[#0056D2] px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 mobile-nav-icon font-medium">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            Back to Exams
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Theme toggle -->
+                    <button id="theme-toggle" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">
+                        <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- User profile (hidden for profile deletion layout requirement, supporting active JS safely) -->
+                    <div class="relative" style="display: none !important;">
+                        <button id="profile-dropdown-btn" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                <span id="user-initials">U</span>
+                            </div>
+                            <span id="user-name" class="text-sm font-medium">User</span>
+                        </button>
+                        
+                        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                            <div class="py-2">
+                                <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                    <div id="dropdown-phone">+0000000000</div>
+                                </div>
+                                <hr class="border-gray-200 dark:border-gray-700">
+                                <button id="logout-btn" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-120px)]">
+            <!-- Users List -->
+            <div class="lg:col-span-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Users</h2>
+                    
+                    <!-- Search -->
+                    <div class="relative">
+                        <input type="text" id="user-search" placeholder="Search users..." 
+                               class="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Users List -->
+                <div id="users-list" class="overflow-y-auto h-[calc(100%-80px)]">
+                    <!-- Users will be populated here -->
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
+                <!-- Chat Header -->
+                <div id="chat-header" class="p-4 border-b border-gray-200 dark:border-gray-700 hidden">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+                            <span id="chat-user-initials">U</span>
+                        </div>
+                        <div>
+                            <h3 id="chat-user-name" class="text-lg font-semibold text-gray-900 dark:text-white">User Name</h3>
+                            <div class="flex items-center space-x-2">
+                                <div id="chat-user-status" class="online-indicator offline"></div>
+                                <span id="chat-user-status-text" class="text-sm text-gray-500 dark:text-gray-400">Offline</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Welcome Message -->
+                <div id="welcome-message" class="flex-1 flex items-center justify-center">
+                    <div class="text-center">
+                        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Select a user to start chatting</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Choose someone from the users list to begin a conversation</p>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="messages-container" class="messages-container overflow-y-auto p-4 hidden">
+                    <div id="messages-list" class="space-y-4">
+                        <!-- Messages will be populated here -->
+                    </div>
+                    
+                    <!-- Typing Indicator -->
+                    <div id="typing-indicator" class="typing-indicator flex items-center space-x-2 text-gray-500 dark:text-gray-400 text-sm">
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                        <span id="typing-text">typing...</span>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div id="message-input-container" class="p-4 border-t border-gray-200 dark:border-gray-700 hidden">
+                    <form id="message-form" class="flex space-x-2">
+                        <input type="text" id="message-input" placeholder="Type your message..." 
+                               class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 sm:py-8 mt-auto transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-xs text-slate-500 dark:text-slate-400">
+                    &copy; 2026 <span class="font-bold text-[#0056D2] dark:text-blue-400">EXAM Prep Portal</span>. Learn without limits.
+                </span>
+            </div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 sm:text-right">
+                Developed by 
+                <a href="https://bernardfiagbenu-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" class="font-semibold text-[#0056D2] dark:text-blue-400 hover:underline">
+                    Bernard Fiagbenu
+                </a>, 
+                <span class="italic">Computing Instructor at Unique Child</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, onSnapshot, serverTimestamp, addDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPQxZvBmsJQ4kGxnWWBPs1pwRZnB8i3VE",
+            authDomain: "g00gleauthen-2afqo4.firebaseapp.com",
+            projectId: "g00gleauthen-2afqo4",
+            storageBucket: "g00gleauthen-2afqo4.appspot.com",
+            messagingSenderId: "151985888576",
+            appId: "1:151985888576:web:g00gleauthen-2afqo4"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Chat System
+        class ChatSystem {
+            constructor() {
+                this.currentUser = null;
+                this.selectedUser = null;
+                this.users = [];
+                this.messages = [];
+                this.unsubscribeUsers = null;
+                this.unsubscribeMessages = null;
+                this.unsubscribeTyping = null;
+                
+                this.initializeEventListeners();
+                this.checkAuth();
+            }
+
+            initializeEventListeners() {
+                // Theme toggle
+                document.getElementById('theme-toggle').addEventListener('click', this.toggleTheme.bind(this));
+                
+                // Profile dropdown
+                document.getElementById('profile-dropdown-btn').addEventListener('click', this.toggleProfileDropdown.bind(this));
+                document.getElementById('logout-btn').addEventListener('click', this.logout.bind(this));
+                
+                // User search
+                document.getElementById('user-search').addEventListener('input', this.filterUsers.bind(this));
+                
+                // Message form
+                document.getElementById('message-form').addEventListener('submit', this.sendMessage.bind(this));
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#profile-dropdown-btn')) {
+                        document.getElementById('profile-dropdown').classList.add('hidden');
+                    }
+                });
+            }
+
+            checkAuth() {
+                // Check if user is logged in using localStorage (your existing auth method)
+                const userData = localStorage.getItem('userData');
+                if (userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        this.currentUser = {
+                            uid: user.uid || user.phone || user.phoneNumber,
+                            displayName: user.displayName,
+                            phone: user.phone || user.phoneNumber
+                        };
+                        this.loadUserProfile();
+                        this.loadUsers();
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                        this.redirectToLogin();
+                    }
+                } else {
+                    this.redirectToLogin();
+                }
+            }
+
+            redirectToLogin() {
+                // Store the intended destination
+                localStorage.setItem('redirectAfterLogin', 'chat.html');
+                window.location.href = 'index.html';
+            }
+
+            async loadUserProfile() {
+                try {
+                    // Use localStorage data first, then try to fetch from Firestore
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    const displayName = userData.displayName || 'User';
+                    const initials = this.getInitials(displayName);
+                    
+                    document.getElementById('user-initials').textContent = initials;
+                    document.getElementById('user-name').textContent = displayName;
+                    
+                    // Update dropdown phone
+                    const phone = userData.phone || userData.phoneNumber || '+0000000000';
+                    const school = userData.school || '';
+                    document.getElementById('dropdown-phone').textContent = school ? `${phone} • ${school}` : phone;
+
+                    // Try to fetch additional data from Firestore if needed
+                    try {
+                        const userDoc = await getDoc(doc(db, 'users', this.currentUser.uid));
+                        if (userDoc.exists()) {
+                            const firestoreData = userDoc.data();
+                            // Update with any missing data from Firestore
+                            if (!userData.school && firestoreData.school) {
+                                userData.school = firestoreData.school;
+                                localStorage.setItem('userData', JSON.stringify(userData));
+                                document.getElementById('dropdown-phone').textContent = `${phone} • ${firestoreData.school}`;
+                            }
+                        }
+                    } catch (firestoreError) {
+                        console.log('Could not fetch from Firestore, using localStorage data');
+                    }
+                } catch (error) {
+                    console.error('Error loading user profile:', error);
+                }
+            }
+
+            async loadUsers() {
+                try {
+                    // Ensure we have a valid user ID
+                    if (!this.currentUser || !this.currentUser.uid) {
+                        console.error('No valid user ID found');
+                        this.redirectToLogin();
+                        return;
+                    }
+
+                    // Listen to users collection
+                    const usersRef = collection(db, 'users');
+                    const q = query(usersRef, orderBy('displayName'));
+                    
+                    this.unsubscribeUsers = onSnapshot(q, (snapshot) => {
+                        this.users = snapshot.docs
+                            .map(doc => ({ id: doc.id, ...doc.data() }))
+                            .filter(user => user.id !== this.currentUser.uid); // Exclude current user
+                        
+                        this.renderUsers();
+                    }, (error) => {
+                        console.error('Error loading users:', error);
+                        // Show a fallback message
+                        const usersList = document.getElementById('users-list');
+                        if (usersList) {
+                            usersList.innerHTML = `
+                                <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                    <p>Unable to load users. Please check your connection.</p>
+                                    <button onclick="location.reload()" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg">
+                                        Retry
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                    // Show error message
+                    const usersList = document.getElementById('users-list');
+                    if (usersList) {
+                        usersList.innerHTML = `
+                            <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                <p>Error loading users. Please try again.</p>
+                                <button onclick="location.reload()" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg">
+                                    Retry
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            renderUsers() {
+                const usersList = document.getElementById('users-list');
+                const searchTerm = document.getElementById('user-search').value.toLowerCase();
+                
+                const filteredUsers = this.users.filter(user => 
+                    user.displayName?.toLowerCase().includes(searchTerm) ||
+                    user.school?.toLowerCase().includes(searchTerm)
+                );
+
+                usersList.innerHTML = filteredUsers.map(user => `
+                    <div class="user-item p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700" data-user-id="${user.id}">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+                                ${this.getInitials(user.displayName || 'User')}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2">
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        ${user.displayName || 'User'}
+                                    </h4>
+                                    <div class="online-indicator ${user.online ? 'online' : 'offline'}"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                    ${user.school || 'No school'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add click listeners
+                usersList.querySelectorAll('.user-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const userId = item.dataset.userId;
+                        this.selectUser(userId);
+                    });
+                });
+            }
+
+            filterUsers() {
+                this.renderUsers();
+            }
+
+            selectUser(userId) {
+                this.selectedUser = this.users.find(user => user.id === userId);
+                if (!this.selectedUser) return;
+
+                // Update UI
+                document.getElementById('welcome-message').classList.add('hidden');
+                document.getElementById('chat-header').classList.remove('hidden');
+                document.getElementById('messages-container').classList.remove('hidden');
+                document.getElementById('message-input-container').classList.remove('hidden');
+
+                // Update chat header
+                const displayName = this.selectedUser.displayName || 'User';
+                document.getElementById('chat-user-initials').textContent = this.getInitials(displayName);
+                document.getElementById('chat-user-name').textContent = displayName;
+                
+                const isOnline = this.selectedUser.online || false;
+                document.getElementById('chat-user-status').className = `online-indicator ${isOnline ? 'online' : 'offline'}`;
+                document.getElementById('chat-user-status-text').textContent = isOnline ? 'Online' : 'Offline';
+
+                // Load messages
+                this.loadMessages();
+            }
+
+            async loadMessages() {
+                if (!this.selectedUser) return;
+
+                // Unsubscribe from previous messages
+                if (this.unsubscribeMessages) {
+                    this.unsubscribeMessages();
+                }
+
+                try {
+                    const chatId = this.getChatId(this.currentUser.uid, this.selectedUser.id);
+                    const messagesRef = collection(db, 'chats', chatId, 'messages');
+                    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+                    this.unsubscribeMessages = onSnapshot(q, (snapshot) => {
+                        this.messages = snapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data()
+                        }));
+                        this.renderMessages();
+                    });
+                } catch (error) {
+                    console.error('Error loading messages:', error);
+                }
+            }
+
+            renderMessages() {
+                const messagesList = document.getElementById('messages-list');
+                
+                messagesList.innerHTML = this.messages.map(message => {
+                    const isOwn = message.senderId === this.currentUser.uid;
+                    const timestamp = message.timestamp?.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
+                    const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    return `
+                        <div class="flex ${isOwn ? 'justify-end' : 'justify-start'}">
+                            <div class="message-bubble ${isOwn ? 'sent' : 'received'} rounded-lg px-4 py-2 max-w-xs lg:max-w-md">
+                                <p class="text-sm">${message.text}</p>
+                                <p class="text-xs ${isOwn ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'} mt-1">${timeString}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Scroll to bottom
+                messagesList.scrollTop = messagesList.scrollHeight;
+            }
+
+            async sendMessage(e) {
+                e.preventDefault();
+                
+                if (!this.selectedUser) return;
+
+                const input = document.getElementById('message-input');
+                const text = input.value.trim();
+                
+                if (!text) return;
+
+                try {
+                    const chatId = this.getChatId(this.currentUser.uid, this.selectedUser.id);
+                    const messagesRef = collection(db, 'chats', chatId, 'messages');
+                    
+                    await addDoc(messagesRef, {
+                        text: text,
+                        senderId: this.currentUser.uid,
+                        senderName: this.currentUser.displayName || 'User',
+                        timestamp: serverTimestamp()
+                    });
+
+                    // Clear input
+                    input.value = '';
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                }
+            }
+
+            getChatId(userId1, userId2) {
+                // Create consistent chat ID regardless of who initiates
+                return [userId1, userId2].sort().join('_');
+            }
+
+            getInitials(name) {
+                return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            }
+
+            toggleTheme() {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                this.updateThemeIcons(isDark);
+            }
+
+            updateThemeIcons(isDark) {
+                const sunIcon = document.getElementById('sun-icon');
+                const moonIcon = document.getElementById('moon-icon');
+                
+                if (isDark) {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                } else {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                }
+            }
+
+            toggleProfileDropdown() {
+                document.getElementById('profile-dropdown').classList.toggle('hidden');
+            }
+
+            async logout() {
+                try {
+                    // Clear localStorage (your existing logout method)
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('selectedYear');
+                    localStorage.removeItem('selectedSubject');
+                    localStorage.removeItem('redirectAfterLogin');
+                    
+                    // Try Firebase logout as well
+                    try {
+                        await signOut(auth);
+                    } catch (firebaseError) {
+                        console.log('Firebase logout failed, continuing with localStorage logout');
+                    }
+                    
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    // Force redirect even if there's an error
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+        }
+
+        // AI Chatbot - Already loaded via script tag
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if AI chatbot loaded successfully
+            if (typeof AIChatbot !== 'undefined') {
+                console.log('AI Chatbot loaded successfully');
+            } else {
+                console.warn('AI Chatbot failed to load');
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            
+            // Add debug mode
+            const debugMode = localStorage.getItem('debug') === 'true';
+            if (debugMode) {
+                console.log('Chat System Debug Mode Enabled');
+                console.log('User Data:', localStorage.getItem('userData'));
+                console.log('Redirect After Login:', localStorage.getItem('redirectAfterLogin'));
+            }
+            
+            try {
+                new ChatSystem();
+            } catch (error) {
+                console.error('Error initializing Chat System:', error);
+                // Show error message to user
+                const main = document.querySelector('main');
+                if (main) {
+                    main.innerHTML = `
+                        <div class="flex items-center justify-center min-h-screen">
+                            <div class="text-center">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Error Loading Chat</h3>
+                                <p class="text-gray-500 dark:text-gray-400 mb-4">Something went wrong. Please try again.</p>
+                                <button onclick="location.reload()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                                    Reload Page
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+    
+    <!-- AI Chatbot Script -->
+    <script src="ai-chatbot.js"></script>
+</body>
+</html>

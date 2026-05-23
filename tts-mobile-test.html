@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Mobile Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* TTS button styles */
+        .tts-btn {
+            background: #3b82f6;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        .tts-btn:hover { 
+            background: #2563eb; 
+            color: #ffffff; 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        .tts-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+        .tts-btn:focus { 
+            outline: 2px solid #1d4ed8; 
+            outline-offset: 2px; 
+        }
+        .tts-btn.speaking { 
+            background: #dc2626; 
+            color: #fff; 
+            border-color: #dc2626; 
+            animation: pulse 1.5s infinite;
+        }
+        .tts-btn.paused {
+            background: #f59e0b;
+            color: #fff;
+            border-color: #f59e0b;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Make TTS button more visible */
+        #tts-button-container {
+            min-width: 36px;
+            min-height: 36px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">TTS Mobile Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Test Instructions:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700 text-sm">
+                <li>Click the blue speaker button next to the question</li>
+                <li>Wait for speech to start (button turns red and pulses)</li>
+                <li>Click again to pause (button turns orange)</li>
+                <li>Click again to resume (button turns red and pulses)</li>
+                <li>Check console for debugging information</li>
+            </ol>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Test Question:</h2>
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center mb-3">
+                    <span class="text-sm font-medium text-blue-400">QUESTION 1</span>
+                    <div id="tts-button-container"></div>
+                </div>
+                <p class="text-base font-medium mb-4 text-gray-900">
+                    A programmer has indented the codes in the program being written. The purpose of the indentation is to
+                </p>
+                <div class="space-y-2">
+                    <div class="p-3 border border-gray-200 rounded-lg">A. make the code difficult to read by users.</div>
+                    <div class="p-3 border border-gray-200 rounded-lg">B. hide the code from others when writing it.</div>
+                    <div class="p-3 border border-gray-200 rounded-lg">C. create bugs in the program to disturb the codes.</div>
+                    <div class="p-3 border border-gray-200 rounded-lg">D. show the start and end of a conditional statement.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-lg font-semibold mb-4">Console Output:</h2>
+            <div id="console-output" class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-xs h-48 overflow-y-auto">
+                <div>Console output will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TTS Module -->
+    <script>
+        const TTS = (() => {
+            let voices = [];
+            let preferredVoice = null;
+            let currentUtterance = null;
+            let isPaused = false;
+
+            function init() {
+                if (!('speechSynthesis' in window)) return;
+                const load = () => {
+                    voices = speechSynthesis.getVoices();
+                    const preferredNames = [
+                        'Google US English',
+                        'Microsoft Aria Online (Natural) - English (United States)',
+                        'Microsoft Zira Desktop - English (United States)',
+                        'Microsoft Guy Online (Natural) - English (United States)'
+                    ];
+                    preferredVoice = null;
+                    for (const n of preferredNames) {
+                        const v = voices.find(v => v.name === n);
+                        if (v) { preferredVoice = v; break; }
+                    }
+                    if (!preferredVoice) {
+                        preferredVoice = voices.find(v => /^en(-|_)/i.test(v.lang)) || voices[0] || null;
+                    }
+                };
+                load();
+                if (typeof speechSynthesis.addEventListener === 'function') {
+                    speechSynthesis.addEventListener('voiceschanged', load);
+                } else {
+                    setTimeout(load, 250);
+                }
+            }
+
+            function stripMarkup(text) {
+                if (!text) return '';
+                return String(text)
+                    .replace(/\*\*?/g, '')
+                    .replace(/_+/g, ' dash ')
+                    .replace(/<[^>]+>/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+
+            function buildQuestionTtsText(questionText, optionsArray, questionNumber) {
+                // Remove the question number from the beginning of the question text
+                const q = stripMarkup(questionText).replace(/^\d+\.\s*/, '');
+                const opts = (optionsArray || []).map((opt, i) => {
+                    // Remove the option letter prefix (A., B., C., D.) and clean the text
+                    const cleanOption = stripMarkup(opt).replace(/^[A-Z]\.\s*/, '');
+                    const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F'];
+                    const label = optionLabels[i] || String.fromCharCode(65 + i);
+                    return `Option ${label}. ${cleanOption}`;
+                }).join('. ');
+                
+                // Add "Question X" prefix
+                const questionPrefix = questionNumber ? `Question ${questionNumber}. ` : '';
+                return opts ? `${questionPrefix}${q}. ${opts}.` : `${questionPrefix}${q}.`;
+            }
+
+            function cancelSpeechForButton(btn) {
+                if ('speechSynthesis' in window) {
+                    try {
+                        speechSynthesis.cancel();
+                        console.log('TTS: Speech cancelled');
+                    } catch (error) {
+                        console.error('TTS: Error cancelling speech:', error);
+                    }
+                    currentUtterance = null;
+                    isPaused = false;
+                }
+                if (btn) {
+                    btn.classList.remove('speaking', 'paused');
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.setAttribute('aria-label', 'Read this question');
+                    btn.title = 'Read this question';
+                    updateButtonIcon(btn, 'play');
+                }
+            }
+
+            function pauseSpeech() {
+                if ('speechSynthesis' in window && currentUtterance && !isPaused) {
+                    try {
+                        speechSynthesis.pause();
+                        isPaused = true;
+                        console.log('TTS: Speech paused');
+                    } catch (error) {
+                        console.error('TTS: Error pausing speech:', error);
+                    }
+                }
+            }
+
+            function resumeSpeech() {
+                if ('speechSynthesis' in window && currentUtterance && isPaused) {
+                    try {
+                        speechSynthesis.resume();
+                        isPaused = false;
+                        console.log('TTS: Speech resumed');
+                    } catch (error) {
+                        console.error('TTS: Error resuming speech:', error);
+                        // Fallback: restart speech if resume fails
+                        if (currentUtterance) {
+                            const text = currentUtterance.text;
+                            cancelSpeechForButton(document.querySelector('.tts-btn.speaking'));
+                            setTimeout(() => {
+                                speakText(text, document.querySelector('.tts-btn'));
+                            }, 100);
+                        }
+                    }
+                }
+            }
+
+            function stopAllSpeech() {
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+                    currentUtterance = null;
+                    isPaused = false;
+                }
+            }
+
+            function speakText(text, btn) {
+                if (!('speechSynthesis' in window)) return;
+                
+                // Cancel any existing speech
+                cancelSpeechForButton(btn);
+                
+                const u = new SpeechSynthesisUtterance(text);
+                currentUtterance = u;
+                
+                // Store text for potential restart
+                u.text = text;
+                
+                if (preferredVoice) u.voice = preferredVoice;
+                u.rate = 1.0;
+                u.pitch = 1.0;
+                u.volume = 1.0;
+                
+                u.onstart = () => {
+                    console.log('TTS: Speech started');
+                    if (btn) {
+                        btn.classList.add('speaking');
+                        btn.classList.remove('paused');
+                        btn.setAttribute('aria-pressed', 'true');
+                        btn.setAttribute('aria-label', 'Pause reading');
+                        btn.title = 'Pause reading';
+                        updateButtonIcon(btn, 'pause');
+                    }
+                };
+                
+                u.onpause = () => {
+                    console.log('TTS: Speech paused');
+                    if (btn) {
+                        btn.classList.add('paused');
+                        btn.setAttribute('aria-label', 'Resume reading');
+                        btn.title = 'Resume reading';
+                        updateButtonIcon(btn, 'play');
+                    }
+                };
+                
+                u.onresume = () => {
+                    console.log('TTS: Speech resumed');
+                    if (btn) {
+                        btn.classList.remove('paused');
+                        btn.setAttribute('aria-label', 'Pause reading');
+                        btn.title = 'Pause reading';
+                        updateButtonIcon(btn, 'pause');
+                    }
+                };
+                
+                const clear = () => {
+                    console.log('TTS: Speech ended/error');
+                    currentUtterance = null;
+                    isPaused = false;
+                    cancelSpeechForButton(btn);
+                };
+                
+                u.onend = clear;
+                u.onerror = (event) => {
+                    console.error('TTS: Speech error:', event);
+                    clear();
+                };
+                
+                try {
+                    speechSynthesis.speak(u);
+                    console.log('TTS: Speech queued');
+                } catch (error) {
+                    console.error('TTS: Error starting speech:', error);
+                    clear();
+                }
+            }
+
+            function updateButtonIcon(btn, state) {
+                const iconContainer = btn.querySelector('.tts-icon-container');
+                if (!iconContainer) return;
+                
+                iconContainer.innerHTML = '';
+                
+                if (state === 'play') {
+                    iconContainer.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    `;
+                } else if (state === 'pause') {
+                    iconContainer.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                        </svg>
+                    `;
+                } else if (state === 'stop') {
+                    iconContainer.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="6" y="4" width="12" height="16"/>
+                        </svg>
+                    `;
+                }
+            }
+
+            function createButton() {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'tts-btn';
+                btn.setAttribute('aria-label', 'Read this question');
+                btn.setAttribute('title', 'Read this question');
+                btn.innerHTML = `
+                    <div class="tts-icon-container">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                `;
+                return btn;
+            }
+
+            function attach(containerEl, questionText, optionsArray, questionNumber) {
+                if (!containerEl) return;
+                const btn = createButton();
+                if (!('speechSynthesis' in window)) {
+                    btn.disabled = true;
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.title = 'Text-to-speech not supported in this browser';
+                } else {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('TTS: Button clicked, current state:', {
+                            speaking: btn.classList.contains('speaking'),
+                            paused: btn.classList.contains('paused'),
+                            isPaused: isPaused
+                        });
+                        
+                        if (btn.classList.contains('speaking')) {
+                            if (isPaused || btn.classList.contains('paused')) {
+                                console.log('TTS: Resuming speech');
+                                resumeSpeech();
+                            } else {
+                                console.log('TTS: Pausing speech');
+                                pauseSpeech();
+                            }
+                        } else {
+                            console.log('TTS: Starting new speech');
+                            const text = buildQuestionTtsText(questionText, optionsArray, questionNumber);
+                            speakText(text, btn);
+                        }
+                    });
+                    
+                    // Add touch event handling for mobile
+                    btn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                    }, { passive: false });
+                }
+                containerEl.appendChild(btn);
+                return btn;
+            }
+
+            return { init, attach, stripMarkup, buildQuestionTtsText, speakText, stopAllSpeech };
+        })();
+
+        // Initialize TTS
+        document.addEventListener('DOMContentLoaded', () => {
+            TTS.init();
+            
+            // Attach TTS button to the test question
+            const ttsContainer = document.getElementById('tts-button-container');
+            const questionText = "A programmer has indented the codes in the program being written. The purpose of the indentation is to";
+            const options = [
+                "A. make the code difficult to read by users.",
+                "B. hide the code from others when writing it.",
+                "C. create bugs in the program to disturb the codes.",
+                "D. show the start and end of a conditional statement."
+            ];
+            
+            TTS.attach(ttsContainer, questionText, options, 1);
+            
+            // Override console.log to show output on page
+            const originalLog = console.log;
+            const originalError = console.error;
+            const consoleOutput = document.getElementById('console-output');
+            
+            function addToConsole(message, type = 'log') {
+                const timestamp = new Date().toLocaleTimeString();
+                const color = type === 'error' ? 'text-red-400' : 'text-green-400';
+                const div = document.createElement('div');
+                div.className = color;
+                div.textContent = `[${timestamp}] ${message}`;
+                consoleOutput.appendChild(div);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+            
+            console.log = function(...args) {
+                originalLog.apply(console, args);
+                addToConsole(args.join(' '));
+            };
+            
+            console.error = function(...args) {
+                originalError.apply(console, args);
+                addToConsole(args.join(' '), 'error');
+            };
+            
+            console.log('TTS Mobile Test initialized');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot Fix Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">AI Chatbot Text Input Fix Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Instructions:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Look for the blue chat button in the bottom-right corner</li>
+                <li>Click it to open the AI chatbot</li>
+                <li>Try typing in the input field - it should be enabled</li>
+                <li>Type a message like "hello" or "help me study"</li>
+                <li>Press Enter or click the send button</li>
+                <li>Check if the AI responds</li>
+                <li>Try typing another message - input should remain enabled</li>
+            </ol>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Expected Behavior:</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                <li>✅ Input field should be enabled when chat opens</li>
+                <li>✅ You should be able to type in the input field</li>
+                <li>✅ Enter key should send messages</li>
+                <li>✅ Send button should work</li>
+                <li>✅ Input should remain enabled after sending</li>
+                <li>✅ AI should respond with helpful study tips</li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Console Output:</h2>
+            <div id="console-output" class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm h-64 overflow-y-auto">
+                <div>Console output will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot Script -->
+    <script src="ai-chatbot.js"></script>
+    
+    <script>
+        // Override console.log to show output on page
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'text-red-400' : 'text-green-400';
+            const div = document.createElement('div');
+            div.className = color;
+            div.textContent = `[${timestamp}] ${message}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+
+        // Check if chatbot is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded, checking AI chatbot...');
+            
+            setTimeout(() => {
+                if (window.AIChatbot) {
+                    console.log('✅ AI Chatbot is loaded and available');
+                    console.log('Available methods:', Object.keys(window.AIChatbot));
+                    
+                    // Test the input field
+                    setTimeout(() => {
+                        const input = document.getElementById('chatbot-input');
+                        if (input) {
+                            console.log('✅ Chatbot input field found');
+                            console.log('Input disabled:', input.disabled);
+                            console.log('Input readonly:', input.readOnly);
+                        } else {
+                            console.error('❌ Chatbot input field not found');
+                        }
+                    }, 2000);
+                } else {
+                    console.error('❌ AI Chatbot not found');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

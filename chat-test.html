@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Authentication Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Chat Authentication Test</h1>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Status</h2>
+            
+            <div id="status" class="space-y-4">
+                <!-- Status will be populated here -->
+            </div>
+            
+            <div class="mt-6 space-y-4">
+                <button onclick="testAuth()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Test Authentication
+                </button>
+                
+                <button onclick="testRedirect()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Test Redirect to Chat
+                </button>
+                
+                <button onclick="clearData()" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    Clear All Data
+                </button>
+                
+                <button onclick="goToChat()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    Go to Chat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            const statusDiv = document.getElementById('status');
+            const userData = localStorage.getItem('userData');
+            const redirectAfterLogin = localStorage.getItem('redirectAfterLogin');
+            
+            let html = '';
+            
+            // User Data Status
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    html += `
+                        <div class="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
+                            <h3 class="font-medium text-green-800 dark:text-green-200">✅ User Data Found</h3>
+                            <p class="text-sm text-green-700 dark:text-green-300">
+                                Name: ${user.displayName || 'N/A'}<br>
+                                Phone: ${user.phone || user.phoneNumber || 'N/A'}<br>
+                                UID: ${user.uid || 'N/A'}<br>
+                                School: ${user.school || 'N/A'}
+                            </p>
+                        </div>
+                    `;
+                } catch (e) {
+                    html += `
+                        <div class="p-3 bg-red-100 dark:bg-red-900 rounded-lg">
+                            <h3 class="font-medium text-red-800 dark:text-red-200">❌ Invalid User Data</h3>
+                            <p class="text-sm text-red-700 dark:text-red-300">${e.message}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                html += `
+                    <div class="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                        <h3 class="font-medium text-yellow-800 dark:text-yellow-200">⚠️ No User Data</h3>
+                        <p class="text-sm text-yellow-700 dark:text-yellow-300">User is not logged in</p>
+                    </div>
+                `;
+            }
+            
+            // Redirect Status
+            if (redirectAfterLogin) {
+                html += `
+                    <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                        <h3 class="font-medium text-blue-800 dark:text-blue-200">🔄 Redirect Pending</h3>
+                        <p class="text-sm text-blue-700 dark:text-blue-300">Will redirect to: ${redirectAfterLogin}</p>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <h3 class="font-medium text-gray-800 dark:text-gray-200">📍 No Redirect</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">No redirect destination set</p>
+                    </div>
+                `;
+            }
+            
+            statusDiv.innerHTML = html;
+        }
+        
+        function testAuth() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                alert('✅ Authentication test passed! User is logged in.');
+            } else {
+                alert('❌ Authentication test failed! No user data found.');
+            }
+        }
+        
+        function testRedirect() {
+            localStorage.setItem('redirectAfterLogin', 'chat.html');
+            alert('✅ Redirect test set! Try logging in now.');
+            updateStatus();
+        }
+        
+        function clearData() {
+            localStorage.removeItem('userData');
+            localStorage.removeItem('redirectAfterLogin');
+            localStorage.removeItem('selectedYear');
+            localStorage.removeItem('selectedSubject');
+            alert('✅ All data cleared!');
+            updateStatus();
+        }
+        
+        function goToChat() {
+            window.location.href = 'chat.html';
+        }
+        
+        // Update status on page load
+        updateStatus();
+        
+        // Update status every 2 seconds
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>

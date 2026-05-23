@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXAM - News & Updates</title>
+    
+    <script>
+        // Tailwind CDN config: enable class-based dark mode
+        window.tailwind = window.tailwind || {};
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA basics -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: all 0.3s ease;
+        }
+        
+        /* Enhanced accessibility for light mode */
+        body {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        /* Enhanced accessibility for dark mode */
+        body.dark {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        
+        /* High contrast text colors */
+        .dark h1, .dark h2, .dark h3, .dark p, .dark span, .dark div {
+            color: #ffffff !important;
+        }
+        
+        .dark .bg-white {
+            background-color: #000000 !important;
+        }
+        
+        .dark .bg-gray-50 {
+            background-color: #111111 !important;
+        }
+        
+        .dark .bg-gray-100 {
+            background-color: #222222 !important;
+        }
+        
+        .dark .bg-gray-800 {
+            background-color: #000000 !important;
+        }
+        
+        .dark .bg-gray-700 {
+            background-color: #111111 !important;
+        }
+        
+        .dark .bg-gray-900 {
+            background-color: #000000 !important;
+        }
+        
+        .dark .border-gray-200 {
+            border-color: #333333 !important;
+        }
+        
+        .dark .border-gray-700 {
+            border-color: #333333 !important;
+        }
+        
+        .dark .text-gray-600 {
+            color: #ffffff !important;
+        }
+        
+        .dark .text-gray-500 {
+            color: #cccccc !important;
+        }
+        
+        .dark .text-gray-400 {
+            color: #cccccc !important;
+        }
+        
+        .dark .text-gray-300 {
+            color: #ffffff !important;
+        }
+        
+        .dark .text-gray-900 {
+            color: #ffffff !important;
+        }
+        
+        .dark .text-gray-100 {
+            color: #ffffff !important;
+        }
+        
+        /* Enhanced button and interactive element colors */
+        .dark .hover\:bg-gray-50:hover {
+            background-color: #111111 !important;
+        }
+        
+        .dark .hover\:bg-gray-200:hover {
+            background-color: #222222 !important;
+        }
+        
+        .dark .hover\:bg-gray-600:hover {
+            background-color: #333333 !important;
+        }
+        
+        .dark .hover\:bg-gray-700:hover {
+            background-color: #222222 !important;
+        }
+        
+        /* News card hover effects */
+        .news-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .news-card {
+            border-color: #333333;
+        }
+        
+        .dark .news-card:hover {
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Ensure all text is visible in both modes */
+        .dark .text-blue-600 {
+            color: #60a5fa !important;
+        }
+        
+        .dark .text-blue-400 {
+            color: #60a5fa !important;
+        }
+        
+        .dark .text-green-600 {
+            color: #34d399 !important;
+        }
+        
+        .dark .text-green-400 {
+            color: #34d399 !important;
+        }
+        
+        .dark .text-red-600 {
+            color: #f87171 !important;
+        }
+        
+        .dark .text-red-400 {
+            color: #f87171 !important;
+        }
+        
+        /* Ensure backgrounds are properly contrasted */
+        .dark .bg-blue-100 {
+            background-color: #1e3a8a !important;
+        }
+        
+        .dark .bg-blue-900 {
+            background-color: #1e3a8a !important;
+        }
+        
+        .dark .bg-green-100 {
+            background-color: #065f46 !important;
+        }
+        
+        .dark .bg-green-900 {
+            background-color: #065f46 !important;
+        }
+        
+        .dark .bg-red-50 {
+            background-color: #7f1d1d !important;
+        }
+        
+        .dark .bg-red-900 {
+            background-color: #7f1d1d !important;
+        }
+        
+        /* Enhanced Rankings ticker for mobile */
+        .ticker-container { 
+            position: relative; 
+            overflow: hidden; 
+            width: 100%;
+        }
+        .ticker-track { 
+            display: flex; 
+            width: max-content; 
+            animation: ticker-scroll 30s linear infinite; 
+        }
+        .ticker-item { 
+            white-space: nowrap; 
+            padding: 0 1rem; 
+            border-right: 1px solid rgba(0,0,0,0.1); 
+            font-size: 0.875rem;
+        }
+        .dark .ticker-item { 
+            border-right-color: #333333; 
+        }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        /* News specific styles */
+        .news-badge {
+            transition: all 0.2s ease;
+        }
+        
+        .news-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .news-image {
+            transition: all 0.3s ease;
+        }
+        
+        .news-card:hover .news-image {
+            transform: scale(1.02);
+        }
+        
+        /* Loading animation */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        .dark .loading-skeleton {
+            background: linear-gradient(90deg, #333333 25%, #444444 50%, #333333 75%);
+            background-size: 200% 100%;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Mobile-specific optimizations */
+        @media (max-width: 768px) {
+            /* Full width mobile layout */
+            .max-w-7xl {
+                max-width: 100% !important;
+            }
+            
+            /* Reduced padding for mobile */
+            .px-4 {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+            
+            .sm\:px-6 {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            .lg\:px-8 {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            /* Larger text for mobile readability */
+            .text-3xl {
+                font-size: 1.875rem !important;
+                line-height: 2.25rem !important;
+            }
+            
+            .text-lg {
+                font-size: 1.125rem !important;
+                line-height: 1.75rem !important;
+            }
+            
+            /* Better spacing for mobile */
+            .py-8 {
+                padding-top: 1.5rem !important;
+                padding-bottom: 1.5rem !important;
+            }
+            
+            .mb-8 {
+                margin-bottom: 1.5rem !important;
+            }
+            
+            /* Full width news grid on mobile */
+            .grid-cols-1 {
+                grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+            }
+            
+            /* Larger news cards on mobile */
+            .news-card {
+                margin-bottom: 1rem !important;
+                padding: 1rem !important;
+            }
+            
+            /* Better news badge spacing */
+            .news-badge {
+                margin-bottom: 0.5rem !important;
+                margin-right: 0.5rem !important;
+                padding: 0.5rem 1rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Enhanced ticker for mobile */
+            .ticker-item {
+                font-size: 0.75rem !important;
+                padding: 0 0.75rem !important;
+            }
+            
+            /* Better header layout on mobile */
+            .h-16 {
+                height: 4rem !important;
+            }
+            
+            /* Improved navigation buttons */
+            .text-sm {
+                font-size: 0.875rem !important;
+            }
+            
+            /* Better profile dropdown on mobile */
+            #profile-dropdown {
+                width: 100% !important;
+                max-width: 280px !important;
+                right: 0.5rem !important;
+            }
+            
+            /* Enhanced category buttons for mobile */
+            .flex.flex-wrap.gap-2 {
+                gap: 0.5rem !important;
+            }
+            
+            /* Better news card content spacing */
+            .news-card h3 {
+                font-size: 1.125rem !important;
+                line-height: 1.5rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+            
+            .news-card p {
+                font-size: 0.875rem !important;
+                line-height: 1.375rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            /* Improved loading skeleton for mobile */
+            .loading-skeleton {
+                height: 200px !important;
+            }
+            
+            /* Better page header on mobile */
+            .mb-2 {
+                margin-bottom: 0.5rem !important;
+            }
+            
+            /* Enhanced back and chat buttons */
+            .ml-4.flex.items-center.space-x-2 {
+                margin-left: 0.5rem !important;
+            }
+            
+            .space-x-2 > * + * {
+                margin-left: 0.25rem !important;
+            }
+        }
+        
+        /* Extra small mobile optimizations */
+        @media (max-width: 480px) {
+            /* Even more compact layout */
+            .px-4 {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+            
+            .py-8 {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+            
+            /* Single column layout */
+            .grid-cols-1 {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Compact news cards */
+            .news-card {
+                padding: 0.75rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+            
+            /* Smaller text for very small screens */
+            .text-3xl {
+                font-size: 1.5rem !important;
+                line-height: 2rem !important;
+            }
+            
+            .text-lg {
+                font-size: 1rem !important;
+                line-height: 1.5rem !important;
+            }
+            
+            /* Compact header */
+            .h-16 {
+                height: 3.5rem !important;
+            }
+            
+            /* Hide some elements on very small screens */
+            .hidden-xs {
+                display: none !important;
+            }
+        }
+        
+        /* Mobile Navigation Icons - Bigger in mobile view */
+        @media (max-width: 768px) {
+            .mobile-nav-icon {
+                padding: 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .mobile-nav-icon svg {
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+            }
+            
+            .mobile-nav-icon:hover {
+                background-color: rgba(59, 130, 246, 0.1) !important;
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 min-h-screen">
+    <div class="flex flex-col min-h-screen">
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-3">
+                        <a href="index.html" class="flex items-center space-x-2">
+                            <div class="bg-[#0056D2] rounded px-3 py-1.5 text-white font-extrabold text-lg tracking-wider shadow-sm">
+                                EXAM
+                            </div>
+                            <span class="text-lg font-bold text-slate-800 dark:text-white hidden sm:block">News & Updates</span>
+                        </a>
+                        <nav class="hidden md:flex space-x-4 border-l border-slate-200 dark:border-slate-700 pl-4 ml-4">
+                            <a href="index.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0056D2] dark:hover:text-blue-400 transition-colors">Exam Portal</a>
+                            <a href="chat.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#0056D2] dark:hover:text-blue-400 transition-colors">AI Tutor Chat</a>
+                        </nav>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2 md:hidden">
+                            <a href="exam-select.html" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#0056D2] px-2 py-1">Back</a>
+                            <a href="chat.html" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#0056D2] px-2 py-1">AI Chat</a>
+                        </div>
+                        
+                        <button id="theme-toggle" class="p-2 ml-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 focus:outline-none transition-colors" aria-label="Toggle Theme">
+                            <svg id="sun-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Hidden User Profile (Referenced safely by existing JS scripts without crash) -->
+                        <div class="relative" style="display: none !important;">
+                            <button id="profile-dropdown-btn" class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                    <span id="user-initials">U</span>
+                                </div>
+                                <span id="user-name" class="text-sm font-medium hidden sm:block">User</span>
+                            </button>
+                            
+                            <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                                <div class="py-2">
+                                    <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                        <div id="dropdown-phone">+0000000000</div>
+                                    </div>
+                                    <hr class="border-gray-200 dark:border-gray-700">
+                                    <button id="logout-btn" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Live Rankings Ticker -->
+        <div id="rankings-ticker-wrapper" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-2">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div id="rankings-ticker" class="ticker-container bg-slate-100 dark:bg-slate-950/40" style="width:100%;">
+                    <div class="flex">
+                        <div id="ticker-track-a" class="ticker-track py-1 text-xs text-slate-600 dark:text-slate-300"></div>
+                        <div id="ticker-track-b" class="ticker-track py-1 text-xs text-slate-600 dark:text-slate-300"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Page Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Latest News & Updates</h1>
+                    <p class="text-gray-600 dark:text-gray-400">Stay updated with the latest exam information, tips, and announcements</p>
+                </div>
+
+                <!-- News Categories -->
+                <div class="mb-8">
+                    <div class="flex flex-wrap gap-2">
+                        <button class="news-badge px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-200">
+                            All News
+                        </button>
+                        <button class="news-badge px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+                            Exam Updates
+                        </button>
+                        <button class="news-badge px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-medium hover:bg-green-200 dark:hover:bg-green-800 transition-colors duration-200">
+                            Study Tips
+                        </button>
+                        <button class="news-badge px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors duration-200">
+                            Announcements
+                        </button>
+                    </div>
+                </div>
+
+                <!-- News Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid">
+                    <!-- News cards will be populated here -->
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="news-card bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                        <div class="loading-skeleton h-48 rounded-lg mb-4"></div>
+                        <div class="loading-skeleton h-4 rounded mb-2"></div>
+                        <div class="loading-skeleton h-4 rounded mb-2 w-3/4"></div>
+                        <div class="loading-skeleton h-3 rounded mb-4 w-1/2"></div>
+                        <div class="loading-skeleton h-3 rounded w-2/3"></div>
+                    </div>
+                    <div class="news-card bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                        <div class="loading-skeleton h-48 rounded-lg mb-4"></div>
+                        <div class="loading-skeleton h-4 rounded mb-2"></div>
+                        <div class="loading-skeleton h-4 rounded mb-2 w-3/4"></div>
+                        <div class="loading-skeleton h-3 rounded mb-4 w-1/2"></div>
+                        <div class="loading-skeleton h-3 rounded w-2/3"></div>
+                    </div>
+                    <div class="news-card bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                        <div class="loading-skeleton h-48 rounded-lg mb-4"></div>
+                        <div class="loading-skeleton h-4 rounded mb-2"></div>
+                        <div class="loading-skeleton h-4 rounded mb-2 w-3/4"></div>
+                        <div class="loading-skeleton h-3 rounded mb-4 w-1/2"></div>
+                        <div class="loading-skeleton h-3 rounded w-2/3"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 sm:py-8 mt-auto transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">
+                        &copy; 2026 <span class="font-bold text-[#0056D2] dark:text-blue-400">EXAM Prep Portal</span>. Learn without limits.
+                    </span>
+                </div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 sm:text-right">
+                    Developed by 
+                    <a href="https://bernardfiagbenu-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" class="font-semibold text-[#0056D2] dark:text-blue-400 hover:underline">
+                        Bernard Fiagbenu
+                    </a>, 
+                    <span class="italic">Computing Instructor at Unique Child</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPQxZvBmsJQ4kGxnWWBPs1pwRZnB8i3VE",
+            authDomain: "g00gleauthen-2afqo4.firebaseapp.com",
+            projectId: "g00gleauthen-2afqo4",
+            storageBucket: "g00gleauthen-2afqo4.appspot.com",
+            messagingSenderId: "151985888576",
+            appId: "1:151985888576:web:g00gleauthen-2afqo4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Rankings ticker helpers
+        let _tickerRaf = null; 
+        let _lastTs = 0; 
+        const _tickerSpeedPxPerSec = 40;
+        
+        function _startTickerLoop(){
+            const c = document.getElementById('rankings-ticker');
+            const a = document.getElementById('ticker-track-a');
+            const b = document.getElementById('ticker-track-b');
+            if(!c||!a||!b) return;
+            a.style.animation = 'none'; 
+            b.style.animation = 'none';
+            c.scrollLeft = 0; 
+            _lastTs = 0;
+            const step = (ts)=>{
+                if(!_lastTs) _lastTs = ts;
+                const dt = Math.min((ts - _lastTs)/1000, 0.05);
+                _lastTs = ts;
+                const width = a.scrollWidth || 1;
+                c.scrollLeft = (c.scrollLeft + _tickerSpeedPxPerSec * dt) % width;
+                _tickerRaf = requestAnimationFrame(step);
+            };
+            if(_tickerRaf) cancelAnimationFrame(_tickerRaf);
+            _tickerRaf = requestAnimationFrame(step);
+        }
+        
+        function renderTicker(users){
+            const a = document.getElementById('ticker-track-a');
+            const b = document.getElementById('ticker-track-b');
+            if(!a||!b) return;
+            const items = users.map((u,i)=>{
+                const name = (u.displayName||'Student').toString().slice(0,18);
+                const school = (u.school||'').toString().slice(0,18);
+                const schoolSuffix = school ? ` • ${school}` : '';
+                return `<span class="ticker-item">⚡ #${i+1} <span class="font-semibold">${name}</span>${schoolSuffix}</span>`;
+            }).join('');
+            a.innerHTML = items; 
+            b.innerHTML = items;
+            _startTickerLoop();
+        }
+
+        // UI helpers
+        function show(el){ if(el) el.classList.remove('hidden'); }
+        function hide(el){ if(el) el.classList.add('hidden'); }
+        function setText(el, txt){ el.textContent = txt; }
+
+        // Theme management
+        function initTheme(){ 
+            const t=localStorage.getItem('theme')||'light'; 
+            document.documentElement.classList.toggle('dark', t==='dark'); 
+            updateThemeUI(t); 
+        }
+        
+        function toggleTheme(){ 
+            const isDark=document.documentElement.classList.toggle('dark'); 
+            const t=isDark?'dark':'light'; 
+            localStorage.setItem('theme',t); 
+            updateThemeUI(t); 
+        }
+        
+        function updateThemeUI(t){
+            document.getElementById('sun-icon').classList.toggle('hidden', t!=='dark');
+            document.getElementById('moon-icon').classList.toggle('hidden', t==='dark');
+        }
+
+        // User profile management
+        function loadUserProfile() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const displayName = userData.displayName || 'User';
+                const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                
+                document.getElementById('user-initials').textContent = initials;
+                document.getElementById('user-name').textContent = displayName;
+                
+                const phone = userData.phone || userData.phoneNumber || '+0000000000';
+                const school = userData.school || '';
+                document.getElementById('dropdown-phone').textContent = school ? `${phone} • ${school}` : phone;
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+
+        function toggleProfileDropdown() {
+            document.getElementById('profile-dropdown').classList.toggle('hidden');
+        }
+
+        async function logout() {
+            try {
+                localStorage.removeItem('userData');
+                localStorage.removeItem('selectedYear');
+                localStorage.removeItem('selectedSubject');
+                localStorage.removeItem('redirectAfterLogin');
+                
+                try {
+                    await auth.signOut();
+                } catch (firebaseError) {
+                    console.log('Firebase logout failed, continuing with localStorage logout');
+                }
+                
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        // News management
+        function createNewsCard(news) {
+            const categoryColors = {
+                'exam-updates': 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+                'study-tips': 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+                'announcements': 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
+                'general': 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+            };
+            
+            const categoryColor = categoryColors[news.category] || categoryColors.general;
+            const date = new Date(news.timestamp?.toDate ? news.timestamp.toDate() : news.timestamp).toLocaleDateString();
+            
+            return `
+                <div class="news-card bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    ${news.image ? `
+                        <div class="mb-4 overflow-hidden rounded-lg">
+                            <img src="${news.image}" alt="${news.title}" class="news-image w-full h-48 object-cover">
+                        </div>
+                    ` : ''}
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="news-badge px-3 py-1 ${categoryColor} rounded-full text-xs font-medium">
+                            ${news.category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${date}</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">${news.title}</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4">${news.excerpt}</p>
+                    <button onclick="readMore('${news.id}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">
+                        Read More →
+                    </button>
+                </div>
+            `;
+        }
+
+        function loadNews() {
+            const newsGrid = document.getElementById('news-grid');
+            const loadingState = document.getElementById('loading-state');
+            
+            // Show loading state
+            hide(newsGrid);
+            show(loadingState);
+            
+            // Simulate news data (replace with actual Firestore query)
+            const mockNews = [
+                {
+                    id: '1',
+                    title: 'New Mathematics Exam Format Announced',
+                    excerpt: 'The examination board has announced significant changes to the mathematics exam format for the upcoming academic year. These changes aim to better assess students\' problem-solving skills.',
+                    category: 'exam-updates',
+                    timestamp: new Date('2024-01-15')
+                },
+                {
+                    id: '2',
+                    title: 'Top 10 Study Tips for Exam Success',
+                    excerpt: 'Discover proven study techniques that have helped thousands of students achieve excellent results in their examinations. Learn how to manage your time effectively.',
+                    category: 'study-tips',
+                    timestamp: new Date('2024-01-14')
+                },
+                {
+                    id: '3',
+                    title: 'Platform Maintenance Scheduled',
+                    excerpt: 'We will be performing scheduled maintenance on our platform to improve performance and add new features. The maintenance will take place during off-peak hours.',
+                    category: 'announcements',
+                    timestamp: new Date('2024-01-13')
+                },
+                {
+                    id: '4',
+                    title: 'Understanding Complex Mathematical Concepts',
+                    excerpt: 'This comprehensive guide breaks down complex mathematical concepts into easy-to-understand sections, helping students master difficult topics.',
+                    category: 'study-tips',
+                    timestamp: new Date('2024-01-12')
+                },
+                {
+                    id: '5',
+                    title: 'Exam Registration Deadline Extended',
+                    excerpt: 'Due to high demand, we have extended the registration deadline for the upcoming examination period. Don\'t miss this opportunity.',
+                    category: 'announcements',
+                    timestamp: new Date('2024-01-11')
+                },
+                {
+                    id: '6',
+                    title: 'New Practice Questions Available',
+                    excerpt: 'We\'ve added hundreds of new practice questions across all subjects. These questions are designed to help you prepare thoroughly for your exams.',
+                    category: 'exam-updates',
+                    timestamp: new Date('2024-01-10')
+                }
+            ];
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                hide(loadingState);
+                show(newsGrid);
+                
+                newsGrid.innerHTML = mockNews.map(news => createNewsCard(news)).join('');
+            }, 1500);
+        }
+
+        function readMore(newsId) {
+            // Implement news detail view
+            alert(`Opening news article ${newsId}. This would navigate to a detailed view.`);
+        }
+
+        // AI Chatbot - Already loaded via script tag
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if AI chatbot loaded successfully
+            if (typeof AIChatbot !== 'undefined') {
+                console.log('AI Chatbot loaded successfully');
+            } else {
+                console.warn('AI Chatbot failed to load');
+            }
+        });
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadUserProfile();
+            loadNews();
+            
+            // Live rankings stream
+            try{
+                const q = db.collection('users').orderBy('totalScore','desc').limit(20);
+                q.onSnapshot((snap)=>{
+                    const users = snap.docs.map(d=>d.data());
+                    renderTicker(users);
+                });
+            }catch(_){/* ignore */}
+            
+            // Event listeners
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            document.getElementById('profile-dropdown-btn').addEventListener('click', toggleProfileDropdown);
+            document.getElementById('logout-btn').addEventListener('click', logout);
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#profile-dropdown-btn')) {
+                    document.getElementById('profile-dropdown').classList.add('hidden');
+                }
+            });
+            
+            // Category filter buttons
+            document.querySelectorAll('.news-badge').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active state from all buttons
+                    document.querySelectorAll('.news-badge').forEach(btn => {
+                        btn.classList.remove('bg-blue-100', 'dark:bg-blue-900', 'text-blue-800', 'dark:text-blue-200');
+                        btn.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
+                    });
+                    
+                    // Add active state to clicked button
+                    button.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-gray-200');
+                    button.classList.add('bg-blue-100', 'dark:bg-blue-900', 'text-blue-800', 'dark:text-blue-200');
+                    
+                    // Filter news (implement based on category)
+                    const category = button.textContent.toLowerCase().replace(' ', '-');
+                    console.log(`Filtering by category: ${category}`);
+                });
+            });
+        });
+    </script>
+    
+    <!-- AI Chatbot Script -->
+    <script src="ai-chatbot.js"></script>
+</body>
+</html>

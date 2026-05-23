@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile AI Chatbot Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-4">🤖 Mobile AI Chatbot Test</h1>
+            <p class="text-lg opacity-90">Test the AI chatbot on mobile devices</p>
+        </div>
+        
+        <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Test Instructions:</h2>
+            <ol class="text-left space-y-2 text-gray-700 dark:text-gray-300">
+                <li>1. Look for the blue chat button in the bottom-right corner</li>
+                <li>2. Tap the button to open the chat window</li>
+                <li>3. Type a message and press Enter or tap Send</li>
+                <li>4. Check if the AI responds</li>
+                <li>5. Test the clear chat button</li>
+                <li>6. Close the chat window</li>
+            </ol>
+            
+            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                <h3 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">Expected Behavior:</h3>
+                <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                    <li>• Chat button should be visible and tappable</li>
+                    <li>• Chat window should open smoothly</li>
+                    <li>• Input field should accept text</li>
+                    <li>• AI should respond to messages</li>
+                    <li>• All buttons should be touch-friendly</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <p class="text-sm opacity-75">Scroll down to see more content and test the chatbot's positioning</p>
+        </div>
+        
+        <!-- Add some content to test scrolling -->
+        <div class="mt-16 space-y-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+                <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Test Section 1</h3>
+                <p class="text-gray-700 dark:text-gray-300">This content helps test if the chatbot stays in the correct position when scrolling.</p>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+                <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Test Section 2</h3>
+                <p class="text-gray-700 dark:text-gray-300">The chatbot should remain fixed in the bottom-right corner regardless of scroll position.</p>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+                <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Test Section 3</h3>
+                <p class="text-gray-700 dark:text-gray-300">Try opening the chatbot here and see if it appears correctly positioned.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot -->
+    <script src="ai-chatbot.js"></script>
+    
+    <script>
+        // Test chatbot functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Mobile chatbot test page loaded');
+            
+            // Check if chatbot is loaded
+            setTimeout(() => {
+                const chatbot = document.getElementById('ai-chatbot');
+                if (chatbot) {
+                    console.log('✅ AI Chatbot found on page');
+                    
+                    // Test chatbot visibility
+                    const toggleBtn = document.getElementById('chatbot-toggle');
+                    if (toggleBtn) {
+                        console.log('✅ Chatbot toggle button found');
+                        console.log('Chatbot position:', chatbot.getBoundingClientRect());
+                    } else {
+                        console.error('❌ Chatbot toggle button not found');
+                    }
+                } else {
+                    console.error('❌ AI Chatbot not found on page');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

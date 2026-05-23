@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Button Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* TTS button styles */
+        .tts-btn {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+        }
+        .tts-btn:hover { 
+            background: #e2e8f0; 
+            color: #0f172a; 
+            transform: translateY(-1px); 
+        }
+        .tts-btn:focus { 
+            outline: 2px solid #2563eb; 
+            outline-offset: 2px; 
+        }
+        .tts-btn.speaking { 
+            background: #2563eb; 
+            color: #fff; 
+            border-color: #2563eb; 
+        }
+        
+        /* Dark mode TTS button */
+        .dark .tts-btn {
+            background: #374151;
+            border-color: #4b5563;
+            color: #d1d5db;
+        }
+        .dark .tts-btn:hover {
+            background: #4b5563;
+            color: #f9fafb;
+        }
+        .dark .tts-btn.speaking {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-gray-900 dark:text-white">TTS Button Test</h1>
+        
+        <!-- Test Question Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
+            <div id="question-header" class="flex justify-between items-center mb-6">
+                <div class="flex items-center space-x-3">
+                    <span class="text-sm font-medium text-blue-600 dark:text-blue-400">QUESTION <span id="current-question-num">1</span></span>
+                    <div id="tts-button-container"></div>
+                </div>
+                <button class="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors px-3 py-1 rounded-lg">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path>
+                    </svg>
+                    Flag
+                </button>
+            </div>
+            
+            <div class="mb-8">
+                <p class="text-lg sm:text-xl font-medium mb-6 text-gray-900 dark:text-white">
+                    A programmer has indented the codes in the program being written. The purpose of the indentation is to
+                </p>
+                
+                <div class="space-y-3">
+                    <label class="flex items-center p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="question" value="0" class="mr-3 text-blue-600 focus:ring-blue-500">
+                        <span class="flex-1 text-gray-900 dark:text-gray-100">make the code difficult to read by users.</span>
+                    </label>
+                    <label class="flex items-center p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="question" value="1" class="mr-3 text-blue-600 focus:ring-blue-500">
+                        <span class="flex-1 text-gray-900 dark:text-gray-100">hide the code from others when writing it.</span>
+                    </label>
+                    <label class="flex items-center p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="question" value="2" class="mr-3 text-blue-600 focus:ring-blue-500">
+                        <span class="flex-1 text-gray-900 dark:text-gray-100">create bugs in the program to disturb the codes.</span>
+                    </label>
+                    <label class="flex items-center p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="question" value="3" class="mr-3 text-blue-600 focus:ring-blue-500">
+                        <span class="flex-1 text-gray-900 dark:text-gray-100">show the start and end of a conditional statement.</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100">Test Instructions:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-blue-800 dark:text-blue-200">
+                <li>Look for the TTS button (speaker icon) next to "QUESTION 1"</li>
+                <li>Click the TTS button to hear the question and options read aloud</li>
+                <li>The button should change color when speaking</li>
+                <li>Click again to stop the speech</li>
+                <li>Test in both light and dark modes using the toggle below</li>
+            </ol>
+        </div>
+        
+        <!-- Theme Toggle -->
+        <div class="mt-8 text-center">
+            <button id="theme-toggle" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-gray-800 dark:text-gray-200">
+                Toggle Dark Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- TTS Module -->
+    <script>
+        // TTS module (no-answer reveal). Uses Web Speech API, picks clear English voice, says "dash" for underscores.
+        const TTS = (() => {
+            let voices = [];
+            let preferredVoice = null;
+            
+            function init() {
+                if (!('speechSynthesis' in window)) return;
+                
+                const load = () => {
+                    voices = speechSynthesis.getVoices();
+                    const preferredNames = [
+                        'Google US English',
+                        'Microsoft Aria Online (Natural) - English (United States)',
+                        'Microsoft Zira Desktop - English (United States)',
+                        'Microsoft Guy Online (Natural) - English (United States)'
+                    ];
+                    preferredVoice = null;
+                    for (const n of preferredNames) {
+                        const v = voices.find(v => v.name === n);
+                        if (v) {
+                            preferredVoice = v;
+                            break;
+                        }
+                    }
+                    if (!preferredVoice) {
+                        preferredVoice = voices.find(v => /^en(-|_)/i.test(v.lang)) || voices[0] || null;
+                    }
+                };
+                
+                load();
+                if (typeof speechSynthesis.addEventListener === 'function') {
+                    speechSynthesis.addEventListener('voiceschanged', load);
+                } else {
+                    setTimeout(load, 250);
+                }
+            }
+            
+            function stripMarkup(text) {
+                if (!text) return '';
+                return String(text)
+                    .replace(/\*\*?/g, '')
+                    .replace(/_+/g, ' dash ')
+                    .replace(/<[^>]+>/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+            
+                         function buildQuestionTtsText(questionText, optionsArray) {
+                 const q = stripMarkup(questionText);
+                 const opts = (optionsArray || []).map((opt, i) => {
+                     // Remove the option letter prefix (A., B., C., D.) and clean the text
+                     const cleanOption = stripMarkup(opt).replace(/^[A-Z]\.\s*/, '');
+                     const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F'];
+                     const label = optionLabels[i] || String.fromCharCode(65 + i);
+                     return `Option ${label}. ${cleanOption}`;
+                 }).join('. ');
+                 return opts ? `${q}. ${opts}.` : `${q}.`;
+             }
+            
+            function cancelSpeechForButton(btn) {
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                if (btn) {
+                    btn.classList.remove('speaking');
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.setAttribute('aria-label', 'Read this question');
+                    btn.title = 'Read this question';
+                }
+            }
+            
+            function speakText(text, btn) {
+                if (!('speechSynthesis' in window)) return;
+                
+                cancelSpeechForButton(btn);
+                
+                const u = new SpeechSynthesisUtterance(text);
+                if (preferredVoice) u.voice = preferredVoice;
+                u.rate = 1.0;
+                u.pitch = 1.0;
+                u.volume = 1.0;
+                
+                u.onstart = () => {
+                    if (btn) {
+                        btn.classList.add('speaking');
+                        btn.setAttribute('aria-pressed', 'true');
+                        btn.setAttribute('aria-label', 'Stop reading');
+                        btn.title = 'Stop reading';
+                    }
+                };
+                
+                const clear = () => cancelSpeechForButton(btn);
+                u.onend = clear;
+                u.onerror = clear;
+                
+                speechSynthesis.speak(u);
+            }
+            
+            function createButton() {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'tts-btn';
+                btn.setAttribute('aria-label', 'Read this question');
+                btn.setAttribute('title', 'Read this question');
+                btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M5 8v8a3 3 0 0 0 3 3h1V5H8a3 3 0 0 0-3 3z"
+                              stroke="currentColor" stroke-width="2"/>
+                        <path d="M15 9c2 0 4 2 4 3s-2 3-4 3"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                `;
+                return btn;
+            }
+            
+            function attach(containerEl, questionText, optionsArray) {
+                if (!containerEl) return;
+                
+                const btn = createButton();
+                if (!('speechSynthesis' in window)) {
+                    btn.disabled = true;
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.title = 'Text-to-speech not supported in this browser';
+                } else {
+                    btn.addEventListener('click', () => {
+                        if (btn.classList.contains('speaking')) {
+                            cancelSpeechForButton(btn);
+                        } else {
+                            const text = buildQuestionTtsText(questionText, optionsArray);
+                            speakText(text, btn);
+                        }
+                    });
+                }
+                
+                containerEl.appendChild(btn);
+                return btn;
+            }
+            
+            return { init, attach, stripMarkup, buildQuestionTtsText, speakText };
+        })();
+        
+        // Initialize TTS and attach button
+        document.addEventListener('DOMContentLoaded', () => {
+            TTS.init();
+            
+            // Attach TTS button
+            const ttsContainer = document.getElementById('tts-button-container');
+            if (ttsContainer) {
+                const questionText = "A programmer has indented the codes in the program being written. The purpose of the indentation is to";
+                const options = [
+                    "make the code difficult to read by users.",
+                    "hide the code from others when writing it.",
+                    "create bugs in the program to disturb the codes.",
+                    "show the start and end of a conditional statement."
+                ];
+                TTS.attach(ttsContainer, questionText, options);
+            }
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+        });
+    </script>
+</body>
+</html>
