@@ -1,4 +1,22 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/exam-select", "destination": "/exam-select.html" },
+    { "source": "/year-select", "destination": "/year-select.html" },
+    { "source": "/subject-select", "destination": "/subject-select.html" },
+    { "source": "/wassce-year-select", "destination": "/wassce-year-select.html" },
+    { "source": "/wassce-subject-select", "destination": "/wassce-subject-select.html" },
+    { "source": "/wassce-quiz", "destination": "/wassce-quiz.html" },
+    { "source": "/index1", "destination": "/index1.html" },
+    { "source": "/news", "destination": "/news.html" },
+    { "source": "/chat", "destination": "/chat.html" },
+    { "source": "/debug", "destination": "/debug.html" },
+    { "source": "/ai-chatbot-test", "destination": "/ai-chatbot-test.html" },
+    { "source": "/chat-test", "destination": "/chat-test.html" },
+    { "source": "/quick-test", "destination": "/quick-test.html" },
+    { "source": "/simple-tts-test", "destination": "/simple-tts-test.html" },
+    { "source": "/test-app", "destination": "/test-app.html" },
+    { "source": "/test-tts", "destination": "/test-tts.html" }
+  ]
 }
