@@ -20,6 +20,11 @@
         }
     </script>
     <style>
+        /* Monochromatic black and white light theme */
+        html:not(.dark) {
+            filter: grayscale(100%) contrast(105%);
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -278,7 +283,7 @@
     <!-- Realtime Rankings Ticker (Firebase) -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, collection, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBPQxZvBmsJQ4kGxnWWBPs1pwRZnB8i3VE",
@@ -290,7 +295,9 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
 
         const tickerA = document.getElementById('ticker-track-a');
         const tickerB = document.getElementById('ticker-track-b');

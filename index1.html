@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Monochromatic black and white light theme */
+        html:not(.dark) {
+            filter: grayscale(100%) contrast(105%);
+        }
+        
         @keyframes confettiFall {
             0% { 
                 transform: translateY(-100px) translateX(0) rotate(0deg); 
@@ -2151,7 +2156,7 @@
         // Import Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut as firebaseSignOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, updateDoc, increment, deleteDoc, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, updateDoc, increment, deleteDoc, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -2166,7 +2171,9 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
 
         // Global variables for user data and stats
         let currentUser = null;
@@ -2177,14 +2184,430 @@
             rank: '--'
         };
 
-        // Quiz data
-        const quizData = [
-            {question: "1. A programmer has indented the codes in the program being written. The purpose of the indentation is to", options: ["A. make the code difficult to read by users.", "B. hide the code from others when writing it.", "C. create bugs in the program to disturb the codes.", "D. show the start and end of a conditional statement."], correct: 3},
-            {question: "2. At the Internet cafe, Kofi connected his laptop to the Internet without using cable and Akua also connected her laptop to the Internet using cable. An example of Akua's connection type is", options: ["A. Infrared", "B. Bluetooth", "C. Wi-Fi adaptor", "D. Ethernet adapter"], correct: 3},
-            {question: "3. In a group presentation, a group was to demonstrate how to insert an online video into a slide they have created. The first step to be considered by the group is to click on the", options: ["A. Insert tab.", "B. Design tab.", "C. Online video.", "D. Download video."], correct: 0},
-            {question: "4. A man shared his property to his children and wife in a particular ratio. The most appropriate chart type that can be used to represent the sharing of the property is", options: ["A. pie chart.", "B. bar chart.", "C. line chart.", "D. scatter chart."], correct: 0},
-            {question: "5. Robotic systems have components that relates to the functioning of the human organs. The component of the robot that acts like the human brain is the", options: ["A. motors.", "B. sensors.", "C. batteries.", "D. controllers."], correct: 3}
-        ];
+        // Dictionary of at least 10 high-quality questions with answers for each BECE subject,
+        // aligned with the Ghana JHS curriculum and NNF Esquire teacher's guides.
+        const allSubjectQuestions = {
+            'Computing': [
+                {
+                    question: "1. A programmer has indented the codes in the program being written. The purpose of formatting code with indentation is to",
+                    options: ["A. make the code difficult to read by users.", "B. hide the code from others when writing it.", "C. create bugs in the program to disturb the codes.", "D. show the start and end of a conditional statement or code block."],
+                    correct: 3
+                },
+                {
+                    question: "2. At the Internet cafe, Kofi connected his laptop to the Internet without using wire/cable, and Akua connected using a cable. An example of Akua's physical cable connection is",
+                    options: ["A. Infrared connection", "B. Bluetooth connection", "C. Wi-Fi adaptor", "D. Ethernet cable through a RJ-45 port"],
+                    correct: 3
+                },
+                {
+                    question: "3. In a group presentation, a group was to demonstrate how to insert an online video into a slide they have created in presentation software. The first step to be considered by the group is to click on the",
+                    options: ["A. Insert tab.", "B. Design tab.", "C. Online video.", "D. Download video."],
+                    correct: 0
+                },
+                {
+                    question: "4. A man shared his property to his children and wife in a particular ratio. The most appropriate chart type that can be used in a spreadsheet to represent the sharing of the property as proportions of a whole is",
+                    options: ["A. pie chart.", "B. bar chart.", "C. line chart.", "D. scatter chart."],
+                    correct: 0
+                },
+                {
+                    question: "5. Robotic systems have components that relate to the functioning of human organs. The component of the robot that acts like the human brain by processing information is the",
+                    options: ["A. motors.", "B. sensors.", "C. batteries.", "D. controller (microcontroller)."],
+                    correct: 3
+                },
+                {
+                    question: "6. Which of the following computer storage devices has the fastest read and write speeds?",
+                    options: ["A. Floppy Disk", "B. Solid State Drive (SSD)", "C. Hard Disk Drive (HDD)", "D. Compact Disc (CD)"],
+                    correct: 1
+                },
+                {
+                    question: "7. In word processing, what is the shortcut key combination used to copy selected text to the clipboard?",
+                    options: ["A. Ctrl + X", "B. Ctrl + V", "C. Ctrl + C", "D. Ctrl + Z"],
+                    correct: 2
+                },
+                {
+                    question: "8. A set of rules that governs data communication over a network is known as a",
+                    options: ["A. Protocol", "B. Server", "C. Hyperlink", "D. Browser"],
+                    correct: 0
+                },
+                {
+                    question: "9. Which of the following is an example of system software that manages computer hardware and software resources?",
+                    options: ["A. Microsoft Word", "B. Google Chrome", "C. Operating System", "D. Scratch Programming Editor"],
+                    correct: 2
+                },
+                {
+                    question: "10. In HTML, which tag is used to create a hyperlink to another web page?",
+                    options: ["A. <link>", "B. <a>", "C. <href>", "D. <url>"],
+                    correct: 1
+                }
+            ],
+            'Mathematics': [
+                {
+                    question: "1. If P = {prime factors of 30} and Q = {multiples of 3 less than 15}, find the intersection of set P and set Q (P ∩ Q).",
+                    options: ["A. {3}", "B. {3, 5}", "C. {2, 3, 5}", "D. {3, 6, 9, 12}"],
+                    correct: 0
+                },
+                {
+                    question: "2. Express the decimal number 0.000348 in standard notation / scientific form.",
+                    options: ["A. 3.48 × 10^-4", "B. 3.48 × 10^-3", "C. 3.48 × 10^4", "D. 34.8 × 10^-5"],
+                    correct: 0
+                },
+                {
+                    question: "3. Solve the inequality equation representing the math condition: 3x - 4 < 5x + 6.",
+                    options: ["A. x > -5", "B. x < -5", "C. x > 5", "D. x < 5"],
+                    correct: 0
+                },
+                {
+                    question: "4. The interior angle of a regular polygon is measured to be 120 degrees. How many sides does this polygon have?",
+                    options: ["A. 5 sides", "B. 6 sides", "C. 8 sides", "D. 10 sides"],
+                    correct: 1
+                },
+                {
+                    question: "5. If a JHS mapping exercise is drawn to a scale of 1 : 50,000, what actual distance in kilometers is represented by a line 4 cm long on the map?",
+                    options: ["A. 2.0 km", "B. 20.0 km", "C. 0.2 km", "D. 200.0 km"],
+                    correct: 0
+                },
+                {
+                    question: "6. Find the simple interest earned on a GHS 600.00 deposit saved for 2 and a half years at a rate of 8% per annum.",
+                    options: ["A. GHS 120.00", "B. GHS 150.00", "C. GHS 60.00", "D. GHS 180.00"],
+                    correct: 0
+                },
+                {
+                    question: "7. Expand and simplify the algebraic expression: (x + 3)(x - 2).",
+                    options: ["A. x^2 + 5x - 6", "B. x^2 + x - 6", "C. x^2 - x - 6", "D. x^2 + x + 6"],
+                    correct: 1
+                },
+                {
+                    question: "8. A bag contains 5 red balls, 3 blue balls, and 2 green balls. If a ball is selected at random, what is the probability of selecting a blue ball?",
+                    options: ["A. 1/3", "B. 3/10", "C. 1/2", "D. 3/7"],
+                    correct: 1
+                },
+                {
+                    question: "9. Calculate the cross-sectional area of a circle whose radius is measured as 7 cm. (Take pi = 22/7)",
+                    options: ["A. 44 cm^2", "B. 154 cm^2", "C. 22 cm^2", "D. 196 cm^2"],
+                    correct: 1
+                },
+                {
+                    question: "10. Ama bought a textbook for GHS 80.00 and sold it to classmate for GHS 100.00. Calculate her percentage profit margin.",
+                    options: ["A. 20%", "B. 25%", "C. 15%", "D. 30%"],
+                    correct: 1
+                }
+            ],
+            'Integrated Science': [
+                {
+                    question: "1. The physical conversion of a solid substance directly into the gaseous state without passing through the liquid phase is known as",
+                    options: ["A. Condensation", "B. Evaporation", "C. Sublimation", "D. Melting"],
+                    correct: 2
+                },
+                {
+                    question: "2. Which of the following biological processes involves the net movement of water molecules from a region of lower solute density to higher solute density through a semi-permeable membrane?",
+                    options: ["A. Diffusion", "B. Osmosis", "C. Respiration", "D. Transpiration"],
+                    correct: 1
+                },
+                {
+                    question: "3. The primary organ in the human excretory system responsible for filtering nitrogenous urea wastes from blood to produce urine is the",
+                    options: ["A. Lungs", "B. Skin", "C. Kidney", "D. Liver"],
+                    correct: 2
+                },
+                {
+                    question: "4. The type of soil that has the largest average particle grain size, a highly porous loose space, and poor water retention is",
+                    options: ["A. Clay soil", "B. Sandy soil", "C. Loam soil", "D. Silt soil"],
+                    correct: 1
+                },
+                {
+                    question: "5. A practical physics lab electric lamp is rated 60 W, 240 V. Calculate the electrical resistance of the heated filament filament when actively powered.",
+                    options: ["A. 4 ohms", "B. 960 ohms", "C. 14,400 ohms", "D. 40 ohms"],
+                    correct: 1
+                },
+                {
+                    question: "6. Which of the following actions represents a permanent chemical reactions change?",
+                    options: ["A. Dissolving common table sugar in water", "B. Rusting of exposed raw iron nails", "C. Thermal melting of decorative solid candle wax", "D. Freezing liquid water to solid cubes of ice"],
+                    correct: 1
+                },
+                {
+                    question: "7. The active biological digestive enzyme amylase, present in human saliva, is responsible for beginning the structural break down of",
+                    options: ["A. Proteins", "B. Fats", "C. Starch (Carbohydrates)", "D. Vitamins"],
+                    correct: 2
+                },
+                {
+                    question: "8. The ultimate celestial primary source of thermal energy driving all earthly weather systems, monsoon wind systems, and biological food chains is the",
+                    options: ["A. Earth's core heating", "B. Solar sun radiation", "C. Gravitational lunar moon pull", "D. Deep ocean floor currents"],
+                    correct: 1
+                },
+                {
+                    question: "9. An active chemical solution that successfully turns standard blue litmus indicators to red is classified as",
+                    options: ["A. Acidic", "B. Basic/Alkaline", "C. Saline", "D. Neutralized"],
+                    correct: 0
+                },
+                {
+                    question: "10. Which class of food macronutrients is primarily required by human growth stages for repairing damaged organs and building tissues?",
+                    options: ["A. Carbohydrates", "B. Proteins", "C. Lipids (Fats)", "D. Mineral elements"],
+                    correct: 1
+                }
+            ],
+            'English Language': [
+                {
+                    question: "1. Identify the verb agreement helper that correctly completes the sentence: Neither of the two boys ______ present at the speech yesterday.",
+                    options: ["A. were", "B. was", "C. are", "D. have been"],
+                    correct: 1
+                },
+                {
+                    question: "2. Choose the option that is most nearly identical (synonymous) in meaning to the underlined word: The headmaster gave a *concise* speech.",
+                    options: ["A. overlong and highly detailed", "B. brief, clear and straight to the point", "C. tedious", "D. exceptionally loud"],
+                    correct: 1
+                },
+                {
+                    question: "3. Choose the option that is most directly opposite (antonymous) in meaning to the target word: Her response was very *polite*.",
+                    options: ["A. civil and courteous", "B. exceptionally friendly", "C. rude and impolite", "D. soft and gentle"],
+                    correct: 2
+                },
+                {
+                    question: "4. Complete the sentence with the correct preposition: Kwame has been searching ______ his misplaced Computing text book since morning.",
+                    options: ["A. for", "B. about", "C. matching to", "D. along with"],
+                    correct: 0
+                },
+                {
+                    question: "5. Which of the following sentences exhibits completely correct grammatical punctuation and quoting rules?",
+                    options: ["A. Where are you going, John asked?", "B. \"Where are you going?\" John asked.", "C. Where are you going? John asked,", "D. \"Where are you going\", John asked."],
+                    correct: 1
+                },
+                {
+                    question: "6. Complete the following question tag statement: You aren't leaving the JHS campus yet, ______?",
+                    options: ["A. aren't you", "B. are you", "C. do you", "D. will you"],
+                    correct: 1
+                },
+                {
+                    question: "7. Choose the word option that presents the correct standard spelling:",
+                    options: ["A. Accommodation", "B. Acomodation", "C. Accomodation", "D. Acommodation"],
+                    correct: 0
+                },
+                {
+                    question: "8. Identify the grammatical part of speech of the underlined word: The cheetah runs *extremely* fast.",
+                    options: ["A. Qualifying Adjective", "B. Common Noun", "C. Action Verb", "D. Modifying Adverb"],
+                    correct: 3
+                },
+                {
+                    question: "9. Complete the sentence correctly: If I had known the exam date, I ______ told you yesterday.",
+                    options: ["A. will have", "B. would have", "C. should have", "D. had"],
+                    correct: 1
+                },
+                {
+                    question: "10. What is the linguistic term for words that sound identical but are spelled differently and carry distinct meanings?",
+                    options: ["A. Synonyms", "B. Homophones", "C. Antonyms", "D. Acronyms"],
+                    correct: 1
+                }
+            ],
+            'Social Studies': [
+                {
+                    question: "1. Which of the following physical geographical features is the longest river in Ghana, splitting it into northern and southern sectors?",
+                    options: ["A. River Pra", "B. River Volta", "C. River Tano", "D. River Ankobra"],
+                    correct: 1
+                },
+                {
+                    question: "2. The primary objective of institutional constitutional rule in a democratic nation like Ghana is to",
+                    options: ["A. enforce rigid tribal divisions.", "B. safeguard citizen liberties, human rights, and ensure the rule of law.", "C. provide jobs and income for political office holder groups.", "D. allow a central executive leader to pass arbitrary laws."],
+                    correct: 1
+                },
+                {
+                    question: "3. The transition of girls into womanhood through JHS age rites is celebrated in Ghana. The puberty rites of the Krobo people are called",
+                    options: ["A. Bragoro", "B. Dipo", "C. Hogbetsotso", "D. Kundum"],
+                    correct: 1
+                },
+                {
+                    question: "4. The economic sector of Ghana which historically employs the highest percentage of the country's rural population is",
+                    options: ["A. Manufacturing and steel industries", "B. Agriculture (crop cultivation and fishing)", "C. Services, financial banks, and local tourism", "D. Computing network services and telecom operations"],
+                    correct: 1
+                },
+                {
+                    question: "5. The main agency of the United Nations (UN) that works globally to identify and preserve critical historic world heritage sites is",
+                    options: ["A. UNICEF", "B. UNESCO", "C. WHO", "D. UNHCR"],
+                    correct: 1
+                },
+                {
+                    question: "6. Which important historical beach castle in Ghana served as the initial official seat of national government before moving to Flagstaff House?",
+                    options: ["A. Elmina Castle", "B. Cape Coast Castle", "C. Christiansborg Castle (Osu Castle)", "D. Fort Saint Jago"],
+                    correct: 2
+                },
+                {
+                    question: "7. State-owned public corporations are established by the central Ghanaian government primarily to",
+                    options: ["A. make fast financial commercial profits for ruling political classes.", "B. provide affordable and essential utility services to civilian populations.", "C. compete directly against rising private entrepreneurs.", "D. restrict and regulate open private consumer market spaces."],
+                    correct: 1
+                },
+                {
+                    question: "8. The highest constitutional court of justice in Ghana, empowered with supreme original and appellate jurisdiction in constitutional issues, is the",
+                    options: ["A. High Court", "B. Court of Appeal", "C. Supreme Court of Ghana", "D. District Court"],
+                    correct: 2
+                },
+                {
+                    question: "9. The prime line of longitude that passes through Tema in Ghana and serves as global reference grid for standard hour calculations is the",
+                    options: ["A. Equator of latitude", "B. Greenwich Meridian (Prime Meridian)", "C. Tropic of Cancer", "D. Tropic of Capricorn"],
+                    correct: 1
+                },
+                {
+                    question: "10. Our local natural vegetation and forest reserves in Ghana can be best saved from desertification and environmental degradation by practicing",
+                    options: ["A. uncontrolled shifting cultivation.", "B. massive afforestation and tree planting schemes.", "C. river bank sand winning operations.", "D. commercial logging of immature lumber wood."],
+                    correct: 1
+                }
+            ],
+            'Career Technology': [
+                {
+                    question: "1. The systematic development lifecycle of a tech project design brief includes following which structured sequence?",
+                    options: ["A. direct final build attempts without planning", "B. research, sketching solutions, modeling trial blocks, and final production", "C. selecting the highest priced industrial tooling in JHS", "D. avoiding any preliminary measurements or scale calculations"],
+                    correct: 1
+                },
+                {
+                    question: "2. Which of the following workshop hand tools is designed specifically for scribing clear lines on hard metal workpieces?",
+                    options: ["A. Lead marking pencil", "B. Hardened steel scriber", "C. Chalked marker line", "D. Commercial dye crayon"],
+                    correct: 1
+                },
+                {
+                    question: "3. In a standardized safety workspace environment, the color conventionally painted on danger alarms and machine emergency stop buttons is",
+                    options: ["A. Prussian blue", "B. Safety green", "C. Alert red", "D. Caution yellow"],
+                    correct: 2
+                },
+                {
+                    question: "4. The structural property of a metal like red copper that enables JHS student tools to draw it into ultra fine wire filaments is called",
+                    options: ["A. Malleability", "B. Ductility", "C. Elasticity", "D. Brittleness"],
+                    correct: 1
+                },
+                {
+                    question: "5. A carpentry student needs to assemble two heavy timber pieces of hardwood for a door frame. The strongest and most reliable frame joint is a",
+                    options: ["A. Simple butt joint", "B. Mortise and tenon joint", "C. Standard overlay joint", "D. Plain miter joint"],
+                    correct: 1
+                },
+                {
+                    question: "6. What is the fundamental utility function of a workshop try-square in woodworking and wall masonry works?",
+                    options: ["A. Verifying and marking exact 90-degree square angles", "B. Cutting circular profile shapes in timber blocks", "C. Drilling clean entry holes into wood fiber boards", "D. Gauging deep inside hollow concrete masonry blocks"],
+                    correct: 0
+                },
+                {
+                    question: "7. Which of the following technical processes involves coats of zinc covering raw iron to safeguard against rusting oxidation?",
+                    options: ["A. Metal annealing", "B. Steel galvanization", "C. Heat tempering", "D. Ore smelting"],
+                    correct: 1
+                },
+                {
+                    question: "8. The JHS workshop hand plane tool designed specifically for shaving and flattening rough surface timber boards to uniform dimensions is a",
+                    options: ["A. Hand ripsaw", "B. Bevel edge chisel", "C. Jack plane", "D. Heavy wood mallet"],
+                    correct: 2
+                },
+                {
+                    question: "9. In fabric sewing and home economics dressmaking, folding over the raw edge of a woven fabric and stitching it down to prevent unravelling is called a",
+                    options: ["A. Joining Seam", "B. Folded Hem", "C. Control Dart", "D. Design Pleat"],
+                    correct: 1
+                },
+                {
+                    question: "10. Which workshop personal protective equipment (PPE) is most crucial during grinding metal pieces with high friction sparks?",
+                    options: ["A. Fabric utility gloves", "B. Safety goggles (impacting shields)", "C. Sound barriers", "D. Standard hard hat"],
+                    correct: 1
+                }
+            ],
+            'Religious and Moral Education (RME)': [
+                {
+                    question: "1. According to monotheistic Judeo-Christian creation accounts, on which day of creation did God rest, instituting the Sabbath?",
+                    options: ["A. First day", "B. Third day", "C. Sixth day", "D. Seventh day"],
+                    correct: 3
+                },
+                {
+                    question: "2. In Islamic religious doctrine, the Arabic term designating the mandatory daily formal ritual prayers performed five times is",
+                    options: ["A. Salat", "B. Zakat", "C. Sawm", "D. Hajj"],
+                    correct: 0
+                },
+                {
+                    question: "3. In Traditional Ghanaian Indigenous religions, the Supreme Creator God is recognized among the Akan tribal languages as",
+                    options: ["A. Mawu-Sogbo", "B. Olorun-Olodumare", "C. Onyankopon (Onyame)", "D. Nana Tano"],
+                    correct: 2
+                },
+                {
+                    question: "4. The primary pedagogical teaching goal of conducting traditional puberty initiation rites in historical Ghanaian cultural towns is to",
+                    options: ["A. organize grand celebrations for wealthy classes.", "B. instill high moral virtues, community respect, and adult skills into youth.", "C. choose successors for vacant stool titles.", "D. fairly partition family properties and estates"],
+                    correct: 1
+                },
+                {
+                    question: "5. Honest moral values keep modern civil societies peaceful. Which of the following is considered a positive civic moral value in RME?",
+                    options: ["A. Material greed", "B. Administrative nepotism", "C. Truthfulness and personal integrity", "D. Concentrated egoism"],
+                    correct: 2
+                },
+                {
+                    question: "6. Which joyful religious festival is celebrated by Islamic worshippers worldwide directly upon the completion of fasting in Ramadan?",
+                    options: ["A. Eid al-Adha", "B. Eid al-Fitr", "C. Maulid al-Nabi", "D. Laylat al-Qadr"],
+                    correct: 1
+                },
+                {
+                    question: "7. The Christian holy sacrament of water representing spiritual purification, regeneration, and membership in the universal church of Christ is",
+                    options: ["A. Confirmation", "B. Holy Eucharist", "C. Baptism", "D. Holy Matrimony"],
+                    correct: 2
+                },
+                {
+                    question: "8. The central moral message demonstrated by Christ in the parable of the Good Samaritan is",
+                    options: ["A. protecting and assisting only members of your tribe", "B. offering unconditional kindness and aid to any human in distress", "C. generating material wealth in a highly secure manner", "D. avoiding travels through unsafe public highway systems"],
+                    correct: 1
+                },
+                {
+                    question: "9. Belief in life after physical death in Ghanaian traditional religion is demonstrated by which of the following practices?",
+                    options: ["A. Sharing funny Ananse folklore", "B. Pouring libation to honor deceased ancestors", "C. Conducting crop shifting agriculture", "D. Creating hand carved royal wood stools"],
+                    correct: 1
+                },
+                {
+                    question: "10. Demonstrating continuous humility and obedience to parents, school teachers, and societal elders is productive because it",
+                    options: ["A. guarantees a high personal popularity ranking in class", "B. maintains safe order, mutual respect, and social peace", "C. secures immediate cash presents from municipal councils", "D. grants students special individual exemptions from school rules"],
+                    correct: 1
+                }
+            ],
+            'Creative Arts and Design': [
+                {
+                    question: "1. The three key primary colors on a painter's color wheel from which all other mixed tint colors are derived are",
+                    options: ["A. Orange, Green, Violet", "B. Red, Yellow, Blue", "C. Red, Green, Blue", "D. Pitch Black, Zinc White, Slate Gray"],
+                    correct: 1
+                },
+                {
+                    question: "2. In visual graphics, the precise architectural art term identifying the relative lightness or darkness of a pigment shade or hue is",
+                    options: ["A. Color Value", "B. Surface Texture", "C. Outer Shape", "D. Enclosing Space"],
+                    correct: 0
+                },
+                {
+                    question: "3. The sculpture design process of hand building clay pots or figurines without the assistance of motor-driven potter wheels is called",
+                    options: ["A. Wood carving", "B. Modeling (Coiled, slab, or pinch designs)", "C. Geometric origami folds", "D. Linocut relief carving"],
+                    correct: 1
+                },
+                {
+                    question: "4. The systematic arrangement of sound beats, pauses, and accents repeating over a set of measures in a piece of music describes its",
+                    options: ["A. Vocal Melody", "B. Auditory Pitch", "C. Dynamic Rhythm", "D. Volume Amplitude"],
+                    correct: 2
+                },
+                {
+                    question: "5. In performance arts and school theatre displays, the physical document detailing dialogues, scenes, and stage movements is the",
+                    options: ["A. Event playbill", "B. Performance Script", "C. General scenario sheet", "D. Critic assessment card"],
+                    correct: 1
+                },
+                {
+                    question: "6. Which type of fine art sketch practice concentrates exclusively on depicting arranged non-living objects like bowls, fruits, and books?",
+                    options: ["A. Landscape sketch", "B. Portraiture sketch", "C. Still-life drawing", "D. Abstract design"],
+                    correct: 2
+                },
+                {
+                    question: "7. In creative expression and local storytelling, an intentional dramatic overstatement used to emphasize a state is called a",
+                    options: ["A. Direct Simile", "B. Verbal Hyperbole", "C. Silent Metaphor", "D. Active Personification"],
+                    correct: 1
+                },
+                {
+                    question: "8. Ghana's famous colorful textile woven in narrow wooden looms with expressive geometric patterns and historic proverbs is",
+                    options: ["A. Wax batik cloth", "B. Handwoven Kente cloth", "C. Tied-and-dyed cotton", "D. Plain Calico fabric"],
+                    correct: 1
+                },
+                {
+                    question: "9. The unoccupied negative space surrounding positive visual objects on a drawing canvas is critical because it",
+                    options: ["A. distorts the main scale of objects", "B. balances visual weight and adds breathing room", "C. indicates poor spatial drawing skills", "D. must always be painted with primary colors"],
+                    correct: 1
+                },
+                {
+                    question: "10. The serigraphy print technique where ink is forced through a stencil screen onto canvas or clothing is named",
+                    options: ["A. Relief printing", "B. Stone lithography", "C. Screen printing (Silkscreen stencil)", "D. Cylinder gravure"],
+                    correct: 2
+                }
+            ]
+        };
+
+        // Determine currently selected subject and load its question bank
+        const activeSubjectSelection = localStorage.getItem('selectedSubject') || 'Computing';
+        const quizData = allSubjectQuestions[activeSubjectSelection] || allSubjectQuestions['Computing'];
 
         // Quiz variables
         let currentQuestionIndex = 0;
@@ -4952,6 +5375,8 @@ Analyze the question with maximum intelligence and provide the most contextually
         window.currentPlayingAudio = null;
         
         function playSound(url, questionIndex = currentQuestionIndex) {
+            // Sound effects are disabled per user request
+            return;
             try {
                 if (!url) return;
                 

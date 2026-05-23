@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Monochromatic black and white light theme */
+        html:not(.dark) {
+            filter: grayscale(100%) contrast(105%);
+        }
+        
         @keyframes confettiFall {
             0% { 
                 transform: translateY(-100px) translateX(0) rotate(0deg); 
@@ -2151,7 +2156,7 @@
         // Import Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut as firebaseSignOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, updateDoc, increment, deleteDoc, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, updateDoc, increment, deleteDoc, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -2166,7 +2171,9 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
 
         // Global variables for user data and stats
         let currentUser = null;
@@ -2177,14 +2184,438 @@
             rank: '--'
         };
 
-        // Quiz data
-        const quizData = [
-            {question: "1. A programmer has indented the codes in the program being written. The purpose of the indentation is to", options: ["A. make the code difficult to read by users.", "B. hide the code from others when writing it.", "C. create bugs in the program to disturb the codes.", "D. show the start and end of a conditional statement."], correct: 3},
-            {question: "2. At the Internet cafe, Kofi connected his laptop to the Internet without using cable and Akua also connected her laptop to the Internet using cable. An example of Akua's connection type is", options: ["A. Infrared", "B. Bluetooth", "C. Wi-Fi adaptor", "D. Ethernet adapter"], correct: 3},
-            {question: "3. In a group presentation, a group was to demonstrate how to insert an online video into a slide they have created. The first step to be considered by the group is to click on the", options: ["A. Insert tab.", "B. Design tab.", "C. Online video.", "D. Download video."], correct: 0},
-            {question: "4. A man shared his property to his children and wife in a particular ratio. The most appropriate chart type that can be used to represent the sharing of the property is", options: ["A. pie chart.", "B. bar chart.", "C. line chart.", "D. scatter chart."], correct: 0},
-            {question: "5. Robotic systems have components that relates to the functioning of the human organs. The component of the robot that acts like the human brain is the", options: ["A. motors.", "B. sensors.", "C. batteries.", "D. controllers."], correct: 3}
-        ];
+        // Comprehensive WASSCE Questions Database (10 questions per subject matching actual syllabus requirements)
+        const allWassceQuestions = {
+            'Core Mathematics': [
+                {question: "1. Given that set P = {x : x is a factor of 18} and Q = {x : x is a multiple of 3 less than 20}, find P ∩ Q.", options: ["A. {3, 6, 9}", "B. {1, 2, 3}", "C. {3, 6, 9, 18}", "D. {6, 9, 12, 18}"], correct: 0},
+                {question: "2. If a map is drawn to scale of 1 : 100,000, calculate the actual distance in km represented by 5.5 cm on the map.", options: ["A. 5.5 km", "B. 55 km", "C. 0.55 km", "D. 550 km"], correct: 0},
+                {question: "3. Express 0.000473 in standard scientific form.", options: ["A. 4.73 × 10^-4", "B. 4.73 × 10^-3", "C. 473 × 10^-6", "D. 4.73 × 10^4"], correct: 0},
+                {question: "4. Solve the inequality equation representing: 4x - 7 > 7x + 5.", options: ["A. x < -4", "B. x > -4", "C. x < 4", "D. x > 4"], correct: 0},
+                {question: "5. Find the sum of the interior angles of a regular hexagon.", options: ["A. 720 degrees", "B. 540 degrees", "C. 360 degrees", "D. 180 degrees"], correct: 0},
+                {question: "6. Calculate the simple interest on GHS 12,000 kept for 3 years at 5.5% interest per year.", options: ["A. GHS 1,980.00", "B. GHS 1,800.00", "C. GHS 2,200.00", "D. GHS 1,540.00"], correct: 0},
+                {question: "7. Find the quadratic roots of the equation: x^2 - 5x + 6 = 0.", options: ["A. x = 2 or x = 3", "B. x = -2 or x = -3", "C. x = 1 or x = 6", "D. x = -1 or x = -6"], correct: 0},
+                {question: "8. A box holds 6 red balls and 4 blue balls. If a ball is picked at random, find the probability of choosing a blue ball.", options: ["A. 2/5", "B. 3/5", "C. 1/4", "D. 3/10"], correct: 0},
+                {question: "9. Calculate the principal value of log10(1000) using base 10 rules.", options: ["A. 3", "B. 2", "C. 1", "D. 10"], correct: 0},
+                {question: "10. Calculate the total volume of a right cylinder with radius 7 cm and height 10 cm. (Take pi = 22/7)", options: ["A. 1540 cm^3", "B. 440 cm^3", "C. 154 cm^3", "D. 3080 cm^3"], correct: 0}
+            ],
+            'English Language': [
+                {question: "1. Complete with the correct subjunctive mood verb: The principal requested that the committee ______ the meeting immediately.", options: ["A. adjourn", "B. adjourns", "C. adjourned", "D. should adjourn"], correct: 0},
+                {question: "2. Choose the option closest in meaning to the underlined word: Her arguments were *tenuous* at best.", options: ["A. weak and unsupported", "B. extremely robust", "C. lengthy", "D. highly aggressive"], correct: 0},
+                {question: "3. Choose the option opposite in meaning to the target word: The manager made a *provident* investment.", options: ["A. wasteful and reckless", "B. careful and safe", "C. highly profitable", "D. minimal"], correct: 0},
+                {question: "4. Correctly complete the sentence tag: We had barely started the exam when the bell rang, ______?", options: ["A. had we", "B. hadn't we", "C. did we", "D. didn't we"], correct: 0},
+                {question: "5. Identify the correct spelling from the options below:", options: ["A. Liaison", "B. Liason", "C. Lialson", "D. Liaisson"], correct: 0},
+                {question: "6. Complete the sentence: The young girl was praised ______ her exceptional honesty.", options: ["A. for", "B. with", "C. on", "D. over"], correct: 0},
+                {question: "7. Identify the part of speech of the underlined word: The tiger sprang *upon* the prey.", options: ["A. Preposition", "B. Conjunction", "C. Adverb", "D. Adjective"], correct: 0},
+                {question: "8. Select the grammatically correct sentence structure:", options: ["A. Not only did she complete the quiz, but she also scored 100%.", "B. Not only she completed the quiz, but she also scored 100%.", "C. She completed not only the quiz, but she scored 100% also.", "D. She completed only not the quiz, but also she scored 100%."], correct: 0},
+                {question: "9. What is the passive form of the sentence: 'The teacher has marked the scripts.'?", options: ["A. The scripts have been marked by the teacher.", "B. The scripts were marked by the teacher.", "C. The scripts are being marked by the teacher.", "D. The scripts had been marked by the teacher."], correct: 0},
+                {question: "10. Select the correct relative pronoun: This is the student ______ project won the national science award.", options: ["A. whose", "B. who's", "C. which", "D. that"], correct: 0}
+            ],
+            'Integrated Science': [
+                {question: "1. In of the scientific method, what step follows formulating a testable hypothesis?", options: ["A. Conducting controlled testing/experiments", "B. Publishing general findings", "C. Drawing logical conclusions", "D. Identifying natural problems"], correct: 0},
+                {question: "2. Calculate the atomic mass number of an element having 11 protons and 12 neutrons.", options: ["A. 23", "B. 11", "C. 12", "D. 1.1"], correct: 0},
+                {question: "3. What represents the phenotypic ratio of a Mendelian monohybrid cross between two heterozygous parents?", options: ["A. 3:1", "B. 1:2:1", "C. 9:3:3:1", "D. 1:1"], correct: 0},
+                {question: "4. Which group of organisms is placed at the very base of a trophic food chain?", options: ["A. Producers", "B. Primary consumers", "C. Decomposers", "D. Herbivores"], correct: 0},
+                {question: "5. A convex lens is used to correct which of the following sight defects?", options: ["A. Hypermetropia", "B. Myopia", "C. Astigmatism", "D. Presbyopia"], correct: 0},
+                {question: "6. Which chemical macronutrient is primarily required by plants for protein synthesis and vegetative foliage growth?", options: ["A. Nitrogen", "B. Potassium", "C. Calcium", "D. Zinc"], correct: 0},
+                {question: "7. Which blood vessel carries highly oxygenated blood directly from the lungs to the human heart?", options: ["A. Pulmonary vein", "B. Pulmonary artery", "C. Vena Cava", "D. Aorta"], correct: 0},
+                {question: "8. What is the pH value of a highly acidic solution?", options: ["A. Less than 7", "B. Equal to 7", "C. Greater than 7", "D. Zero"], correct: 0},
+                {question: "9. Which cultural crop management practice involves using mulch materials on soil surfaces?", options: ["A. Soil moisture conservation", "B. Weed propagation", "C. Seedbed erosion induction", "D. Pest breeding decoration"], correct: 0},
+                {question: "10. Which planet is closest to the Sun in our solar system?", options: ["A. Mercury", "B. Venus", "C. Earth", "D. Mars"], correct: 0}
+            ],
+            'Social Studies': [
+                {question: "1. If it is 12:00 UTC at Greenwich (0°), what is the local time in a town situated on longitude 15° East?", options: ["A. 13:00 UTC", "B. 11:00 UTC", "C. 12:00 UTC", "D. 14:00 UTC"], correct: 0},
+                {question: "2. The primary process through which an individual learns the values, beliefs, and behaviors of a culture is known as:", options: ["A. Socialization", "B. Acculturation", "C. Civilization", "D. Globalization"], correct: 0},
+                {question: "3. Which of the following is most effective in promoting national integration and peaceful coexistence in Ghana?", options: ["A. High tolerance of ethnic diversities", "B. Rigid division along tribal lines", "C. Promoting regional isolates", "D. Ban on internal migration"], correct: 0},
+                {question: "4. Under the 1992 Fourth Republic Constitution of Ghana, which organ of government is charged with drafting laws?", options: ["A. Legislature", "B. Judiciary", "C. Executive", "D. Council of State"], correct: 0},
+                {question: "5. The most critical factor for sustainable development and resource optimization in a developing nation is:", options: ["A. Human Resource Development", "B. High population inflation", "C. Importation of foreign labors", "D. Raw gold exports"], correct: 0},
+                {question: "6. Ghana became a pioneer member of which sub-regional organization established in 1975?", options: ["A. ECOWAS", "B. United Nations", "C. African Union", "D. Commonwealth"], correct: 0},
+                {question: "7. A primary driver of juvenile delinquency in growing urban centers is:", options: ["A. Breakdown of traditional parenting models", "B. Free primary education accessibility", "C. High community youth sports center setup", "D. Stringent law inspections"], correct: 0},
+                {question: "8. What describes the average number of children born to a woman during her reproductive years?", options: ["A. Total Fertility Rate", "B. Mortality Rate", "C. Natural growth counter", "D. Dependency Ratio"], correct: 0},
+                {question: "9. The chemical contamination of water bodies through illegal alluvial small-scale gold mining is locally known as:", options: ["A. Galamsey", "B. Sieve sorting", "C. Placer washing", "D. Hardrock tunneling"], correct: 0},
+                {question: "10. In traditional Ghanaian society, what represents the ultimate physical symbol of an Akan chief's authority?", options: ["A. Black Stool", "B. Linguistic staff", "C. Royal crown", "D. Kente shawl"], correct: 0}
+            ],
+            'Physics': [
+                {question: "1. A ball is projected vertically upward from ground level with speed 20 m/s. Calculate maximum height reached. (Take g = 10 m/s^2)", options: ["A. 20 m", "B. 10 m", "C. 40 m", "D. 5 m"], correct: 0},
+                {question: "2. The rate of change of linear momentum of a body under external force is directly proportional to the applied:", options: ["A. Net force", "B. Total mass", "C. Acceleration", "D. Kinetic energy"], correct: 0},
+                {question: "3. A mass of 2.0 kg slides down an inclined plane releasing some energy. Its potential energy drop of 100 J is converted into kinetic energy of 80 J. How much energy is lost as frictional heat?", options: ["A. 20 J", "B. 180 J", "C. 90 J", "D. 50 J"], correct: 0},
+                {question: "4. A radioactive element has half-life of 4 hours. Starting with 80 g, calculate mass remaining after 12 hours.", options: ["A. 10 g", "B. 20 g", "C. 5 g", "D. 2.5 g"], correct: 0},
+                {question: "5. Which electromagnetic wave has the shortest wavelength and highest frequency in the spectrum?", options: ["A. Gamma Rays", "B. X-Rays", "C. Ultraviolet", "D. Radio Waves"], correct: 0},
+                {question: "6. Two static charges Q1 and Q2 are placed a distance r apart. If distance is doubled, the electrostatics force between them becomes:", options: ["A. One-quarter of original", "B. Half of original", "C. Doubled", "D. Quadrupled"], correct: 0},
+                {question: "7. Three resistors of values 2 ohms, 3 ohms, and 6 ohms are connected in parallel. What is their equivalent resistance?", options: ["A. 1 ohm", "B. 11 ohms", "C. 3 ohms", "D. 0.5 ohms"], correct: 0},
+                {question: "8. Calculate the refractive index of a glass block where real depth is 6.0 cm and apparent depth under microscope view is 4.0 cm.", options: ["A. 1.5", "B. 1.33", "C. 2.4", "D. 1.15"], correct: 0},
+                {question: "9. The induced electromotive force in a closed loop conductor is directly proportional to rate of change of magnetic flux. This statement represents:", options: ["A. Faraday's Law", "B. Ohm's Law", "C. Coulomb's Law", "D. Ampere's Law"], correct: 0},
+                {question: "10. An ideal gas undergoes isothermal expansion. Which statement is correct?", options: ["A. Internal energy remains constant", "B. No heat is transferred into system", "C. Pressure remains constant", "D. No external work is done"], correct: 0}
+            ],
+            'Chemistry': [
+                {question: "1. What represents the set of principal quantum number (n) and angular/azimuthal quantum number (l) for a 3d orbital?", options: ["A. n = 3, l = 2", "B. n = 3, l = 1", "C. n = 3, l = 3", "D. n = 2, l = 1"], correct: 0},
+                {question: "2. Which molecule exhibits a linear shape and is nonpolar despite containing polar covalent bonds?", options: ["A. carbon dioxide (CO2)", "B. water (H2O)", "C. ammonia (NH3)", "D. methane (CH4)"], correct: 0},
+                {question: "3. Calculate the number of moles in 8.0 g of oxygen gas (O2, molar mass = 32.0 g/mol).", options: ["A. 0.25 mol", "B. 0.50 mol", "C. 1.00 mol", "D. 2.00 mol"], correct: 0},
+                {question: "4. Going from left to right across a period in the periodic table, ionization energy values generally:", options: ["A. Increase due to rising nuclear charge", "B. Decrease due to rising atomic radius", "C. Remain constant", "D. Drop to zero"], correct: 0},
+                {question: "5. For an exothermic reversible reaction system, raising temperature shifts the equilibrium state towards which side?", options: ["A. Reactants side", "B. Products side", "C. Equilibrium remains unchanged", "D. Complete stoppage of reactions"], correct: 0},
+                {question: "6. During the electrolysis of molten sodium chloride, what product is formed at the discharge anode?", options: ["A. Chlorine gas", "B. Sodium metal", "C. Hydrogen gas", "D. Oxygen gas"], correct: 0},
+                {question: "7. Identify the functional group family name of organic compounds with suffix '-one' like propanone:", options: ["A. Ketone", "B. Alkanol", "C. Alkanoic Acid", "D. Ester"], correct: 0},
+                {question: "8. Estimate pH at equivalence in the titration of weak acetic acid with strong sodium hydroxide.", options: ["A. Greater than 7", "B. Exactly 7", "C. Less than 7", "D. Exactly 1"], correct: 0},
+                {question: "9. How does adding a chemical catalyst speed up a chemical reaction?", options: ["A. Lowers reaction activation energy", "B. Increases reactant collisions heat", "C. Raises product total enthalpy", "D. Neutralizes reaction molecules"], correct: 0},
+                {question: "10. In the extraction of iron in a blast furnace, which chemical agent acts as primary reducing agent?", options: ["A. Carbon monoxide", "B. Coke", "C. Limestone", "D. Nitrogen gas"], correct: 0}
+            ],
+            'Biology': [
+                {question: "1. Which cell organelle contains hydrolytic enzymes and acts as primary intracellular waste digestion center?", options: ["A. Lysosome", "B. Mitochondrion", "C. Golgi body", "D. Ribosome"], correct: 0},
+                {question: "2. How does temperature above optimum (e.g. 60°C) affect digestive enzyme activity?", options: ["A. Denatures enzyme active site", "B. Increases reaction speed exponentially", "C. Neutralizes optimal substrate concentrations", "D. Converts enzymes into cofactors"], correct: 0},
+                {question: "3. Organisms having cell wall made of chitin and reproducing primarily by spores are classified under kingdom:", options: ["A. Fungi", "B. Plantae", "C. Protista", "D. Animalia"], correct: 0},
+                {question: "4. Phloem plant tissue is primarily specialized in translocation of:", options: ["A. Manufactured organic foods", "B. Water and inorganic mineral salt ions", "C. Carbon dioxide gas molecules", "D. Dead cambium fiber residues"], correct: 0},
+                {question: "5. Which stage of photosynthesis requires light energy to split water into oxygen and hydrogen ions (photolysis)?", options: ["A. Light-dependent stage", "B. Dark stage (Calvin cycle)", "C. Glycolysis pathway", "D. Electron transport cycle"], correct: 0},
+                {question: "6. If a heterozygous black guinea pig (Bb) is crossed with white guinea pig (bb), estimate percentage offspring that will be white.", options: ["A. 50%", "B. 25%", "C. 75%", "D. 100%"], correct: 0},
+                {question: "7. Which hormone spikes dramatically around day 14 to trigger ovulation during human menstrual cycle?", options: ["A. Luteinizing Hormone (LH)", "B. Progesterone", "C. Estrogen", "D. Follicle Stimulating Hormone (FSH)"], correct: 0},
+                {question: "8. How many ATP molecules are produced per glucose net during complete aerobic respiration?", options: ["A. 36 or 38", "B. Only 2", "C. Exactly 50", "D. Zero"], correct: 0},
+                {question: "9. The junction gap between two neighboring neurones across which neurotransmitter chemical diffusion occurs is:", options: ["A. Synaptic cleft", "B. Myelin sheath", "C. Node of Ranvier", "D. Axon stem"], correct: 0},
+                {question: "10. An intimate symbiotic relationship where one organism benefits while other is neither harmed nor helped is:", options: ["A. Commensalism", "B. Mutualism", "C. Parasitism", "D. Predation"], correct: 0}
+            ],
+            'Elective Mathematics': [
+                {question: "1. Find remainder when polynomial f(x) = 2x^3 - 3x^2 + 4x - 5 is divided by (x - 2).", options: ["A. 7", "B. -5", "C. 3", "D. -1"], correct: 0},
+                {question: "2. Find equation of circle with center (2, -3) and radius of 5 units.", options: ["A. x^2 + y^2 - 4x + 6y - 12 = 0", "B. x^2 + y^2 + 4x - 6y - 12 = 0", "C. x^2 + y^2 - 4x + 6y + 12 = 0", "D. x^2 + y^2 - 2x + 3y - 25 = 0"], correct: 0},
+                {question: "3. Differentiate f(x) = (3x^2 + 2x)^4 with respect to x.", options: ["A. 4(3x^2 + 2x)^3 · (6x + 2)", "B. 4(3x^2 + 2x)^3", "C. 12(3x^2 + 2x)^3 · (6x)", "D. (6x + 2)^4"], correct: 0},
+                {question: "4. Evaluate dynamic integration interval from 1 to 2 of function: (3x^2 - 2x) dx.", options: ["A. 4", "B. 2", "C. 5", "D. 10"], correct: 0},
+                {question: "5. Find the scalar or dot product of two vectors a = 2i + 3j and b = 4i - j.", options: ["A. 5", "B. 8i - 3j", "C. 11", "D. -2"], correct: 0},
+                {question: "6. Express cos(2A) in terms of sin(A) using trigonometric identities.", options: ["A. 1 - 2sin^2(A)", "B. 2sin^2(A) - 1", "C. 2sin(A)cos(A)", "D. 1 + sin^2(A)"], correct: 0},
+                {question: "7. Find the coefficient of term containing x^3 in binomial expansion of (2 + x)^5.", options: ["A. 40", "B. 10", "C. 80", "D. 20"], correct: 0},
+                {question: "8. How many distinct ways can a committee of 3 members be selected out of 7 candidates?", options: ["A. 35", "B. 210", "C. 5040", "D. 15"], correct: 0},
+                {question: "9. A die is rolled 5 times. Calculate probability of obtaining exactly 3 sixes using binomial distribution.", options: ["A. 5C3 × (1/6)^3 × (5/6)^2", "B. 5C3 × (1/6)^2 × (5/6)^3", "C. (1/6)^3", "D. 5C3 × (1/6)^3"], correct: 0},
+                {question: "10. A stone is projected at angle of 45° with speed 10 m/s. (Take g = 10 m/s^2). Calculate horizontal range.", options: ["A. 10 m", "B. 5 m", "C. 20 m", "D. 2 m"], correct: 0}
+            ],
+            'Literature-in-English': [
+                {question: "1. What literary device is used when part of something is made to represent the whole (e.g., 'all hands on deck')?", options: ["A. Synecdoche", "B. Metonymy", "C. Oxymoron", "D. Personification"], correct: 0},
+                {question: "2. A dramatic speech delivered by a character alone on stage, revealing their inner thoughts is a:", options: ["A. Soliloquy", "B. Aside", "C. Monologue", "D. Prologue"], correct: 0},
+                {question: "3. What represents the specific rhyme scheme of a Shakespearean or English sonnet?", options: ["A. abab cdcd efef gg", "B. abba abba cde cde", "C. abab abab cdcd cd", "D. aabb ccdd eeff gg"], correct: 0},
+                {question: "4. The tragic flaw or error of judgment in Greek tragedy that leads to the hero's downfall is:", options: ["A. Hamartia", "B. Hubris", "C. Catharsis", "D. Nemesis"], correct: 0},
+                {question: "5. An omniscient narrator in prose fiction writes from which perspective?", options: ["A. Third-person, knowing all thoughts", "B. First-person protagonist", "C. Second-person 'you' layout", "D. Third-person, limited view only"], correct: 0},
+                {question: "6. When a play's setting exerts a direct influence on the tragic themes, setting acts as:", options: ["A. Structural antagonist or framework", "B. Simple decorative scene", "C. Epilogue prologue", "D. Dramatic irony source"], correct: 0},
+                {question: "7. The integration of oral folk traditions and proverbs is highly characteristic of which literature genre?", options: ["A. African Prose", "B. Victorian Drama", "C. Renaissance Poetry", "D. Modern Sci-Fi"], correct: 0},
+                {question: "8. A figure of speech that pairings two self-contradictory terms next to each other (e.g., 'bittersweet') is:", options: ["A. Oxymoron", "B. Paradox", "C. Hyperbole", "D. Onomatopoeia"], correct: 0},
+                {question: "9. The central idea, underlying message, or moral investigation of a literary work is named:", options: ["A. Theme", "B. Plot outline", "C. Climax peak", "D. Motif cycle"], correct: 0},
+                {question: "10. When the audience knows critical details about a plot that characters are entirely unaware of, it is:", options: ["A. Dramatic Irony", "B. Cosmic Irony", "C. Situational Irony", "D. Verbal Sarcasm"], correct: 0}
+            ],
+            'Government': [
+                {question: "1. The supreme power of a state to formulate, execute, and enforce laws without external interference is:", options: ["A. Sovereignty", "B. Legitimacy", "C. Authority", "D. Jurisdiction"], correct: 0},
+                {question: "2. The fundamental premise of the Rule of Law requires which of the following?", options: ["A. Equality before the law & supremacy of constitution", "B. Immunity for political leaders", "C. Supremacy of the armed forces", "D. Absence of codification trials"], correct: 0},
+                {question: "3. Which political scientist is primarily associated with classic formulation of Separation of Powers?", options: ["A. Montesquieu", "B. John Locke", "C. Thomas Hobbes", "D. Jean-Jacques Rousseau"], correct: 0},
+                {question: "4. What represents a constitutional provision to check potential excesses of the legislative branch?", options: ["A. Executive presidential veto", "B. Judicial judicial reviews of acts", "C. Citizen public boycotts", "D. Internal parliamentary recesses"], correct: 0},
+                {question: "5. In the pre-colonial Ashanti Empire, the representative council that advised the Asantehene was the:", options: ["A. Asanteman Council", "B. Asafo youth company", "C. Kotoko advisory senate", "D. Okyeame representative panel"], correct: 0},
+                {question: "6. The colonial policy of utilizing traditional rulers to administer local administrative regions was:", options: ["A. Indirect Rule", "B. Assimilation", "C. Association", "D. Direct Encroachment"], correct: 0},
+                {question: "7. Under the 1992 Fourth Republic Constitution of Ghana, how often are presidential general elections held?", options: ["A. Every 4 years", "B. Every 5 years", "C. Every 7 years", "D. Indefinitely"], correct: 0},
+                {question: "8. The core principle that civil service workers must serve any political party in power with dedication is:", options: ["A. Political neutrality", "B. Anonymity", "C. Impartiality", "D. Permanence of tenure"], correct: 0},
+                {question: "9. Which international body succeeded the Organization of African Unity (OAU) in 2002?", options: ["A. African Union (AU)", "B. ECOWAS", "C. United Nations", "D. Southern African Development Board"], correct: 0},
+                {question: "10. What represents the total body of eligible voters in a democratic general election?", options: ["A. Electorate", "B. Constituency", "C. Cabinet", "D. Suffrage league"], correct: 0}
+            ],
+            'History': [
+                {question: "1. Which source of historical evidence involves analyzing physical ruins, pottery shards, and soil excavations?", options: ["A. Archaeological sources", "B. Oral traditions", "C. Archival records", "D. Secondary textbooks"], correct: 0},
+                {question: "2. Which factor contributed significantly to the rise of the ancient Western Sudanic Empire of Ghana?", options: ["A. Monopoly control of Trans-Saharan gold-salt trade", "B. Access to coastal European gun markets", "C. Discovery of massive oil wells", "D. Adoption of maritime sails"], correct: 0},
+                {question: "3. In which year did Portuguese mariners dock on the coast of Elmina, initiating formal European contact?", options: ["A. 1471", "B. 1482", "C. 1492", "D. 1553"], correct: 0},
+                {question: "4. What describes the catastrophic economic and human population impact of the Trans-Atlantic Slave Trade on West Africa?", options: ["A. Disrupted indigenous communities & lost productive youth", "B. Rapid building of coastal manufacturing docks", "C. Universal spread of traditional cash crop techniques", "D. Immediate national integration"], correct: 0},
+                {question: "5. The Bond of 1844 signed between Fante chiefs and Commander George Maclean had what effect?", options: ["A. Extended British judicial influence over coastal states", "B. Transferred complete ownership of land properties to Britain", "C. Initiated immediate military war actions against Ashanti", "D. Granted full sovereign independence"], correct: 0},
+                {question: "6. Which political movement, founded in 1947 by George Grant, was Ghana's first nationalist party?", options: ["A. United Gold Coast Convention (UGCC)", "B. Convention People's Party (CPP)", "C. National Liberation Movement", "D. People's National Party"], correct: 0},
+                {question: "7. In which year did the CPP under Kwame Nkrumah secure complete independent modern statehood?", options: ["A. 1957", "B. 1951", "C. 1960", "D. 1966"], correct: 0},
+                {question: "8. The first military coup d'état that overthrew Ghana's first president occurred on Feb 24 of which year?", options: ["A. 1966", "B. 1972", "C. 1979", "D. 1981"], correct: 0},
+                {question: "9. Who was the key Ghanaian military leader of the PNDC administration before transitioning into democratic rule?", options: ["A. Jerry John Rawlings", "B. Dr. K. A. Busia", "C. Hilla Limann", "D. Ignatius Kutu Acheampong"], correct: 0},
+                {question: "10. Who was the traditional king of ancient Ashanti whose military capture and exile to Seychelles occurred in 1896?", options: ["A. Prempeh I", "B. Osei Tutu I", "C. Opoku Ware I", "D. Yaa Asantewaa"], correct: 0}
+            ],
+            'Christian/Islamic Religious Studies (CRS/IRS)': [
+                {question: "1. CRS: God's command to Abraham to leave Harran to an unknown land is a ultimate demonstration of:", options: ["A. Faith and unconditional obedience", "B. Fear of geographic environments", "C. Seeking agricultural crop lands", "D. Escape from economic taxation"], correct: 0},
+                {question: "2. CRS: During the Passover Exodus event, what did the application of lamb blood on doorposts signify?", options: ["A. Sign for Angel of Death to pass over the house", "B. Simple decorative tribal sign", "C. Indication of lamb food preparation", "D. Escape door marker for armies"], correct: 0},
+                {question: "3. CRS: The prophetic message of Amos in Israel primarily criticized which social challenge?", options: ["A. Oppression of poor & judicial manipulation", "B. Insufficient temple tithes", "C. Lack of animal sacrificial bloods", "D. Simple political foreign treaties"], correct: 0},
+                {question: "4. CRS: In the Sermon on the Mount, Jesus taught that the 'meek' are blessed because they shall:", options: ["A. Inherit the earth", "B. Obtain immediate mercy", "C. Be called children of God", "D. See God"], correct: 0},
+                {question: "5. CRS: In 1 Corinthians 13, St. Paul emphasized that the greatest of all spiritual virtues is:", options: ["A. Love", "B. Prophetic vision", "C. Uttering foreign tongues", "D. Deep scriptural knowledge"], correct: 0},
+                {question: "6. IRS: How many years did the historical revelation of the Holy Al-Quran to Prophet Muhammad span?", options: ["A. 23 years", "B. 10 years", "C. 40 years", "D. 3 years"], correct: 0},
+                {question: "7. IRS: The foundational Islamic pillar of declaring absolute faith in the oneness of Allah is:", options: ["A. Shahadah (Tawhid)", "B. Salah rituals", "C. Zakat giving", "D. Hajj travel"], correct: 0},
+                {question: "8. IRS: The authoritative compilations containing verified sayings and deeds of Prophet Muhammad are the:", options: ["A. Hadiths", "B. Surah divisions", "C. Sharia law books", "D. Tafseer interpretations"], correct: 0},
+                {question: "9. IRS: The term 'Akhlaq' in Islamic ethics primarily refers to which concept?", options: ["A. Perfect moral character, virtue, and disposition", "B. Ritual washing procedures", "C. Friday congregational prayer lines", "D. Compilation of charity funds"], correct: 0},
+                {question: "10. Shared: Both CRS and IRS emphasize that humanity's primary relationship to natural environment must be:", options: ["A. Responsible stewardship and conservation", "B. Unlimited industrial exploitation", "C. Simple passive worship of animals", "D. Fear and complete avoidance"], correct: 0}
+            ],
+            'Economics': [
+                {question: "1. If a 10% increase in the price of a commodity leads to a 20% drop in quantity demanded, demand is:", options: ["A. Elastic", "B. Perfectly inelastic", "C. Unitary elastic", "D. Inelastic"], correct: 0},
+                {question: "2. Which of the following factors shifts the entire demand curve of a commodity to the right?", options: ["A. Increase in consumer disposable income", "B. Increase in commodity manufacturing costs", "C. Government ceiling rules", "D. General price drop of the product"], correct: 0},
+                {question: "3. The Law of Diminishing Marginal Returns states that as more variable factors are added to fixed resources:", options: ["A. Marginal product output eventually declines", "B. Total product falls to zero immediately", "C. Fixed costs double in value", "D. Average costs decline indefinitely"], correct: 0},
+                {question: "4. Which of the following is a key characteristics of a perfectly competitive market structure?", options: ["A. Homogeneous products & many buyers and sellers", "B. Few sellers and unique packaging", "C. High entrance barriers & patented logs", "D. Government direct price fixing"], correct: 0},
+                {question: "5. Gross National Product (GNP) is calculated by adding which component to Gross Domestic Product (GDP)?", options: ["A. Net factor income from abroad", "B. Total capital direct depreciations", "C. Government indirect taxation credits", "D. Household personal saving pools"], correct: 0},
+                {question: "6. Inflation caused primarily by persistent increases in cost of raw materials and labor wages is:", options: ["A. Cost-push inflation", "B. Demand-pull inflation", "C. Hyperinflation cycle", "D. Structural monetary drop"], correct: 0},
+                {question: "7. Which tool of monetary policy can a central bank use to restrict money supply and combat inflation?", options: ["A. Raising the prime discount rate", "B. Purchasing government treasury stocks", "C. Lowering cash reserve ratios", "D. Promoting easy commercial credit cards"], correct: 0},
+                {question: "8. The economic theory that a nation should specialize in producing goods it can manufacture at lowest opportunity cost represents:", options: ["A. Comparative Advantage", "B. Absolute Advantage", "C. Mercantilism", "D. Protected Protectionism"], correct: 0},
+                {question: "9. Public goods are generally described in economic theory as being:", options: ["A. Non-excludable and non-rivalrous in consumption", "B. High profit-generating commodities", "C. Exclusively owned by major corporations", "D. Provided only to tax-paying citizens"], correct: 0},
+                {question: "10. Taxes where the tax rate increases as the taxpayer's taxable income increases are classified as:", options: ["A. Progressive taxes", "B. Regressive taxes", "C. Flat value proportional taxes", "D. Value Added Taxes (VAT)"], correct: 0}
+            ],
+            'Geography': [
+                {question: "1. A line on a contour map that connects points of equal elevation above sea level is:", options: ["A. Contour line", "B. Isotherm", "C. Isobar", "D. Latitude"], correct: 0},
+                {question: "2. The rotation of the Earth on its axis once every 24 hours directly results in:", options: ["A. Alternation of day and night", "B. Changes in seasonal temperatures", "C. Solar eclipses cycles", "D. Global trade winds inversion"], correct: 0},
+                {question: "3. Rock types formed from cooling and solidification of molten magma deep beneath the Earth crust are:", options: ["A. Igneous rocks", "B. Sedimentary rocks", "C. Metorphic rocks", "D. Alluvial deposits"], correct: 0},
+                {question: "4. What describes the average atmospheric conditions of an area taken over a long period (e.g. 35 years)?", options: ["A. Climate", "B. Weather", "C. Humidity", "D. Temperature"], correct: 0},
+                {question: "5. A primary environmental hazard causing severe coastline beach washings in Keta, Ghana is:", options: ["A. Coastal erosion", "B. Desertification", "C. Acidic rainfall", "D. Volcanic activity"], correct: 0},
+                {question: "6. Which agricultural system is characterized by clearing forest plots, cropping, and leaving field fallow?", options: ["A. Shifting cultivation", "B. Pastoral nomadism", "C. Commercial plantation", "D. Hydroponic farming"], correct: 0},
+                {question: "7. Why are most manufacturing industries located in proximity to municipal consumer markets?", options: ["A. Reduces distribution costs for weight-gaining products", "B. Proximity to remote mining ores", "C. Access to cheaper hydro electric lines", "D. Evading state environmental regulations"], correct: 0},
+                {question: "8. Akosombo Hydroelectric Dam built across the Volta River basin serves which primary function?", options: ["A. Electricity generation and inland lake transport", "B. Promoting marine fisheries in deep sea", "C. Preventing coastal salt invasions", "D. Generating alluvial gold ores"], correct: 0},
+                {question: "9. A primary geographical factor forcing rapid rural-to-urban youth migration in Ghana is:", options: ["A. Seeking better career/educational opportunities in cities", "B. High soil fertility in city centers", "C. Traditional chieftaincy rules", "D. High rain densities in urban sites"], correct: 0},
+                {question: "10. Which mode of transportation is most restricted by physical land structures, needing high investment costs?", options: ["A. Railway transport", "B. Maritime shipping", "C. Air freight carriage", "D. Bicycle pathways"], correct: 0}
+            ],
+            'French': [
+                {question: "1. Choisissez la forme correcte du subjonctif: Il faut que nous ______ nos devoirs ce soir.", options: ["A. fassions", "B. faisons", "C. ferons", "D. fissions"], correct: 0},
+                {question: "2. Quel pronom remplace correctement le COD dans: 'Il lit cette lettre'?", options: ["A. Il la lit", "B. Il le lit", "C. Il lui lit", "D. Il y lit"], correct: 0},
+                {question: "3. Complétez avec la préposition correcte: Elle va voyager ______ France la semaine prochaine.", options: ["A. en", "B. au", "C. à", "D. de"], correct: 0},
+                {question: "4. Trouvez l'antonyme correct du mot: 'commencer'", options: ["A. finir", "B. débuter", "C. parler", "D. agir"], correct: 0},
+                {question: "5. Choisissez le pronom possessif correct: 'C'est ma voiture, c'est ______.'", options: ["A. la mienne", "B. le mien", "C. la tienne", "D. leur car"], correct: 0},
+                {question: "6. Complétez: Si j'indique l'heure, je dis: 'Il est deux ______ moins le quart.'", options: ["A. heures", "B. temps", "C. minutes", "D. jours"], correct: 0},
+                {question: "7. Choisissez le mot convenable: Un homme qui soigne les malades à l'hôpital est un ______.", options: ["A. médecin", "B. enseignant", "C. menuisier", "D. maçon"], correct: 0},
+                {question: "8. Choisissez le pronom interrogatif correct: ______ de ces deux livres préférez-vous?", options: ["A. Lequel", "B. Qui", "C. Quoi", "D. Auquel"], correct: 0},
+                {question: "9. Complétez: Je ne connais ______ ici, je suis étranger.", options: ["A. personne", "B. rien", "C. jamais", "D. que"], correct: 0},
+                {question: "10. Quel est l'adjectif démonstratif pour un nom féminin singulier (ex: robe)?", options: ["A. cette", "B. ce", "C. cet", "D. ces"], correct: 0}
+            ],
+            'Accounting': [
+                {question: "1. The accounting convention which holds that financial transactions must be kept distinct from owner personal use is:", options: ["A. Business Entity Concept", "B. Going Concern Concept", "C. Historical Cost Concept", "D. Accrual Concept"], correct: 0},
+                {question: "2. Which of the following errors is not disclosed by the final balancing figures of a Trial Balance?", options: ["A. Error of complete omission", "B. Transposition error", "C. Casting error in sales journal", "D. Extraction discrepancy"], correct: 0},
+                {question: "3. Under which depreciation method does annual depreciation cost decrease progressively every year?", options: ["A. Reducing Balance Method", "B. Straight-Line Method", "C. Sum of the Years Digits", "D. Cost Revaluation Method"], correct: 0},
+                {question: "4. What represents the main helper ledger summarizing purchases and verifying accounts payable balances?", options: ["A. Purchases Ledger Control Account", "B. Sales Ledger Control Account", "C. Suspense Account Account", "D. General Ledger Ledger"], correct: 0},
+                {question: "5. A Cash Book with distinct columns for Cash, Bank, and Discount is classified as:", options: ["A. Three-column Cash Book", "B. Two-column Cash Book", "C. Petty Cash Register", "D. Basic Ledger Book"], correct: 0},
+                {question: "6. What contains the final ledger summaries showing a firm's trading gross profitability at the end of a year?", options: ["A. Trading and Profit & Loss Account", "B. General Trial Balance", "C. Bank Reconciliation Statement", "D. Partnership Deed Ledger"], correct: 0},
+                {question: "7. In a non-profit club, which financial account acts as equivalent of a cash book showing cash logs?", options: ["A. Receipts and Payments Account", "B. Income and Expenditure Account", "C. Trading Gross Ledger", "D. Capital account ledger"], correct: 0},
+                {question: "8. According to partnership rules, where must net profits be apportioned among partners after salary deductions?", options: ["A. Profit and Loss Appropriation Account", "B. Partner personal bank accounts", "C. Joint venture balance accounts", "D. Share Capital account"], correct: 0},
+                {question: "9. When shares are issued at price higher than nominal face value, excess funds are credited to:", options: ["A. Share Premium Account", "B. Authorized Share Capital", "C. Retained Earnings Reserves", "D. Debentures Capital Account"], correct: 0},
+                {question: "10. Calculate the Acid-Test or Quick Ratio of a firm if Current Assets = GHS 50k, Inventory = GHS 20k, and Current Liabilities = GHS 15k.", options: ["A. 2.0 : 1", "B. 3.33 : 1", "C. 1.33 : 1", "D. 0.5 : 1"], correct: 0}
+            ],
+            'Business Management': [
+                {question: "1. What represents the primary legal advantage of operating a Public Limited Company over a Sole Trader?", options: ["A. Limited liability of shareholders", "B. Simple fast incorporation files", "C. Total confidentiality of operations", "D. Complete evasion of state company taxes"], correct: 0},
+                {question: "2. In management functions, the act of assigning duties to subordinates and granting authority is:", options: ["A. Delegation", "B. Planning", "C. Controlling", "D. Directing"], correct: 0},
+                {question: "3. An organization structure that combines functional and project management channels is:", options: ["A. Matrix structure", "B. Line structure", "C. Hierarchical pyramid", "D. Geographic separation"], correct: 0},
+                {question: "4. The HR process that compares employee actual performance against set objectives is:", options: ["A. Performance Appraisal", "B. Selection screening", "C. Job Specification review", "D. Collective bargaining"], correct: 0},
+                {question: "5. What represents the 4 components of standard marketing mix (the 4 Ps)?", options: ["A. Product, Price, Place, Promotion", "B. Planning, Production, Payroll, Purchasing", "C. Packaging, Patents, Publicity, Positioning", "D. Procurement, Pricing, Port, Policy"], correct: 0},
+                {question: "6. What is a short-term source of external finance allowing a bank account balance to run below zero?", options: ["A. Bank Overdraft", "B. Ordinary Share issue", "C. Debenture mortgage", "D. Venture capital"], correct: 0},
+                {question: "7. Which production layout is characterized by continuous mass output of identical standard items?", options: ["A. Flow (mass) production", "B. Job production", "C. Batch production", "D. Project production"], correct: 0},
+                {question: "8. For an agreement to form a legally binding contract, it must contain Offer, Acceptance, and:", options: ["A. Consideration", "B. Traditional signature", "C. Court stamps", "D. Cash payments"], correct: 0},
+                {question: "9. A corporate model where business actively contributes to social welfare and environmental preservation is:", options: ["A. Corporate Social Responsibility (CSR)", "B. Hostile takeover defense", "C. Stakeholder proxy voting", "D. Profit maximization alignment"], correct: 0},
+                {question: "10. In organization communications, informal networks of news spreading are referred to as:", options: ["A. Grapevine", "*B. Circular lines", "C. Memorandums", "D. Official briefs"], correct: 0}
+            ],
+            'Cost Accounting': [
+                {question: "1. The complete cost structure composed of Direct Material, Direct Labor, and Direct Expenses is:", options: ["A. Prime Cost", "B. Overhead Cost", "C. Total Manufacturing Cost", "D. Average Marginal Cost"], correct: 0},
+                {question: "2. Which method of stock valuations issues materials to production using prices of oldest stock first?", options: ["A. First-In, First-Out (FIFO)", "B. Last-In, First-Out (LIFO)", "C. Weighted Average Cost", "D. Base Stock Costing"], correct: 0},
+                {question: "3. Calculating employee wages based exclusively on volume of items produced is classified as:", options: ["A. Piece-rate system", "B. Time-rate system", "C. Premium bonus plan", "D. Commission basis"], correct: 0},
+                {question: "4. The process of distributing collective cost overheads among different cost centers is:", options: ["A. Overhead apportionment", "B. Cost allocation", "C. Overhead absorption", "D. Marginal direct costing"], correct: 0},
+                {question: "5. Integrating both cost accounts and financial logs into one single set of ledgers is:", options: ["A. Integrated Accounting System", "B. Reconciliation Journal", "C. Cost Ledger Control", "D. Interlocking bookkeeping"], correct: 0},
+                {question: "6. Which cost method is designed to calculate cost of dynamic, unique products produced on order?", options: ["A. Job costing", "B. Process costing", "C. Service costing", "D. Standard costing"], correct: 0},
+                {question: "7. In process costing, when the physical output of a run exceeds estimated normal output expectations, we record:", options: ["A. Abnormal gain", "B. Abnormal loss", "C. Scrap value credit", "D. Joint-product yield"], correct: 0},
+                {question: "8. A primary distinction of Marginal Costing is that closing inventory is valued at:", options: ["A. Variable cost only", "B. Total absorption cost", "C. Prime cost only", "D. Realizable market value"], correct: 0},
+                {question: "9. A comprehensive budget summarizing all secondary functional budgets of a firm is the:", options: ["A. Master Budget", "B. Cash Budget", "C. Production Budget", "D. Flexible capital budget"], correct: 0},
+                {question: "10. Calculate breakeven point in units if Fixed Costs = GHS 10k, Selling Price = GHS 15, and Variable Cost = GHS 10.", options: ["A. 2,000 units", "B. 1,000 units", "C. 667 units", "D. 5,000 units"], correct: 0}
+            ],
+            'Food and Nutrition': [
+                {question: "1. Which organic nutrient group acts as biological catalyst and builds muscle tissue structures?", options: ["A. Proteins", "B. Carbohydrates", "C. Monounsaturated Lipids", "D. Calcified Minerals"], correct: 0},
+                {question: "2. Which chemical enzyme discharges in human mouth to initiate digestion of cooked starch?", options: ["A. Salivary amylase (pityalin)", "B. Stomach pepsin", "C. Duodenum trypsin", "D. Intestinal lipase"], correct: 0},
+                {question: "3. Which dietary mineral is primarily essential for red blood cell hemoglobin oxygen carriage?", options: ["A. Iron", "B. Calcium", "C. Sodium", "D. Phosphorus"], correct: 0},
+                {question: "4. To prevent bacterial cross-contamination in kitchens, raw meat raw structures must be kept:", options: ["A. Isolated in seal containers from cooked foods", "B. On top chopping boards for hours", "C. In warm open shelves", "D. Mixed with fresh salad sheets"], correct: 0},
+                {question: "5. Which culinary vegetable cooking method is most effective in conserving water-soluble Vitamin C?", options: ["A. Low water steam boiling", "B. Deep fat heavy frying", "C. Prolonged open-pot boiling", "D. Reheating twice"], correct: 0},
+                {question: "6. Which chemical leavening agent reacts with moisture and heat to release expanding carbon dioxide gas?", options: ["A. Baking powder", "B. Baker's yeast", "C. Dry gelatin", "D. Corn flour starch"], correct: 0},
+                {question: "7. The safest material to use for washing food preparation surfaces is:", options: ["A. Food-grade chemical sanitizers & hot water", "B. Direct dry steel wool sweeps", "C. Scented industrial cleaning soaps", "D. Raw bleach mixtures"], correct: 0},
+                {question: "8. Which method of preserving foods removes moisture to prevent bacterial and mold propagation?", options: ["A. Dehydration (drying)", "B. Canning thermal packs", "C. Chill pasteurization", "D. Chemical pickling"], correct: 0},
+                {question: "9. A balanced meal prepared for an active growing child must contain a high proportion of:", options: ["A. High-quality protein and body-building calcium", "B. Simple concentrated sugar syrups", "C. Isolated saturated fats", "D. Pure bulk fiber bran"], correct: 0},
+                {question: "10. What represents the primary nutritional benefit of consuming West African staple millet and sorghum?", options: ["A. High-density complex carbohydrates and B vitamins", "B. Saturated fatty oil contents", "C. Essential Vitamin B12 traces", "D. Highly concentrated lactose sugars"], correct: 0}
+            ],
+            'Management in Living': [
+                {question: "1. The deliberate process of identifying family goals, examining tools, and choosing action pathways represents:", options: ["A. Home Management", "B. Household budgeting", "C. Labor appraisals", "D. Spatial balance designs"], correct: 0},
+                {question: "2. Which of the following is classified as a fixed expenditure item in family budgeting plans?", options: ["A. monthly house rents", "B. Weekly fresh food buying", "C. Emergency hospital bills", "D. Casual recreation outings"], correct: 0},
+                {question: "3. To create a highly balanced, visually stable look in a small living room, furniture items must:", options: ["A. Be proportioned relative to room size & arranged around a focal point", "B. Overpopulate the central floor path", "C. Be pushed randomly against one corner", "D. Be of ultra-bright contrasting paints"], correct: 0},
+                {question: "4. Under state consumer safety provisions, a buyer has a direct right to obtain:", options: ["A. Safe, functional, and accurately labeled products", "B. Unconditional credit lines", "C. Complete price matching options", "D. Lifetime free exchanges"], correct: 0},
+                {question: "5. Jean Piaget's cognitive theory states that the 'sensorimotor' stage of child development ranges from:", options: ["A. Birth to age 2", "B. Age 2 to 7", "C. Age 7 to 11", "D. Age 12 onwards"], correct: 0},
+                {question: "6. What is the most critical first aid step to take immediately after an accidental minor heat hand burn?", options: ["A. Pouring clean cool running water over the area", "B. Applying thick butter pastes", "C. Piercing heat skin blisters", "D. Wrapping inside air-tight plastic ties"], correct: 0},
+                {question: "7. Which time management technique clusters several small kitchen tasks together during cooking?", options: ["A. Task dovetailing / parallel processing", "B. Isolated linear planning", "C. Delegating tasks out of home", "D. Shorter cooking timing"], correct: 0},
+                {question: "8. A healthy, positive environment to foster balanced child emotional and social development requires:", options: ["A. Consistent boundaries & emotional support", "B. Pampering and zero rules", "C. Continuous isolation times", "D. Harsh physical punishments"], correct: 0},
+                {question: "9. The primary criterion to analyze when selecting a family home location is:", options: ["A. Clean drainage, safe structural access, and ventilation", "B. Dynamic active commercial noise markets", "C. Distance to luxury malls", "D. Complex internal decoration layouts"], correct: 0},
+                {question: "10. In home sanitation, the most effective method to prevent fly-borne disease spreads is:", options: ["A. Keeping garbage fully covered and disposed of regularly", "B. Spraying insecticide chemicals daily", "C. Continuous window sweeps with perfume", "D. Mopping dry floors"], correct: 0}
+            ],
+            'Clothing and Textiles': [
+                {question: "1. Which natural fiber is composed of plant cellulose polymer chains and is highly breathable?", options: ["A. Cotton", "B. Wool", "C. Polyester", "D. Acrylic"], correct: 0},
+                {question: "2. The process of interlacing two distinct sets of yarns (warp and weft) at right angles is:", options: ["A. Weaving", "B. Knitting", "C. Spinning", "D. Felting"], correct: 0},
+                {question: "3. Which part of a standard home sewing machine regulates the tightness of the top thread?", options: ["A. Tension disc", "B. Feed dog", "C. Bobbin case", "D. Balance wheel"], correct: 0},
+                {question: "4. The sewing machine parameter that moves fabric forward under the needle is the:", options: ["A. Feed dog", "B. Presser foot", "C. Stitch regulator", "D. Needle clamp"], correct: 0},
+                {question: "5. A seam styled by sewing down a plain seam fold and flattening it to hide raw edges completely is a:", options: ["A. Flat-felled seam", "B. French seam", "C. Plain overcast seam", "D. Lapped seam"], correct: 0},
+                {question: "6. Pattern drafting tools used to translate human physical measurements into card templates must include:", options: ["A. L-squares and flexible measuring tape", "B. Soft carbon paper", "C. Tailor's chalk only", "D. Simple ruler sticks"], correct: 0},
+                {question: "7. An elegant garment decoration style designed by producing rows of gathers and crisscross threads is:", options: ["A. Smocking", "B. Embroidery", "C. Pleating", "D. Flare attachment"], correct: 0},
+                {question: "8. What wash symbol is universally displayed on fabrics to indicate dry cleaning requirements?", options: ["A. Empty circle", "B. Crossed tub", "C. Square box", "D. Iron with dots"], correct: 0},
+                {question: "9. In wardrobe planning, selecting a versatile set of matching neutral coordinates is known as forming a:", options: ["A. Capsule Wardrobe", "B. Boutique set", "C. Fashion line", "D. Seasonal catalog"], correct: 0},
+                {question: "10. What represents the primary difference between wool and silk fibers?", options: ["A. Wool is curly hair containing keratin; silk is a continuous long protein filament", "B. Wool is synthetic; silk is natural", "C. Wool has higher electrostatic capacity", "D. Silk cannot be dyed"], correct: 0}
+            ],
+            'Graphic Design': [
+                {question: "1. Which of the following is classified as a core element of visual graphic design?", options: ["A. Line, shape, color, and texture", "B. Scale, contrast, dynamic motion, and layout", "C. Printing plates, ink canisters, rollers, and paper", "D. Vector matrices, software menus, and file layers"], correct: 0},
+                {question: "2. Which primary color model is utilized by dynamic commercial offset printing press machines?", options: ["A. CMYK (Cyan, Magenta, Yellow, Key Black)", "B. RGB (Red, Green, Blue)", "C. Pantone spot color grids", "D. Munsell continuous scale"], correct: 0},
+                {question: "3. The precise horizontal spacing adjustment made exclusively between two specific characters to improve readability is:", options: ["A. Kerning", "B. Leading", "C. Tracking", "D. Alignment"], correct: 0},
+                {question: "4. To capture viewer attention in a public poster design, layout must establish a clear:", options: ["A. Visual hierarchy", "B. Isolated alignment", "C. Overlapping clutter", "D. Monotonous gray balance"], correct: 0},
+                {question: "5. Digital computer graphics that retain crisp resolution at any scale are classified as:", options: ["A. Vector graphics", "B. Raster bitmaps", "C. JPEG compressions", "D. Halftone pixels"], correct: 0},
+                {question: "6. A cohesive visual asset designed to represent corporate identity and brand image is a:", options: ["A. Logo", "B. Coupon voucher", "C. Billboard ad", "D. Slogan banner"], correct: 0},
+                {question: "7. Which printing process utilizes a mesh screen and stencil barrier to deposit thick ink on fabrics?", options: ["A. Silkscreen printing", "B. Flexography", "C. Offset lithography", "D. Laser printing"], correct: 0},
+                {question: "8. A cardboard template containing structural fold folds designed to draft packaging boxes is a:", options: ["A. Package net / dieline", "B. Flat stencil blueprint", "C. Mockup graphic", "D. Raster canvas"], correct: 0},
+                {question: "9. The visual area of a design layout that is entirely unoccupied by graphic imagery or text is:", options: ["A. Negative space / White space", "B. Bleed margin", "C. Contrast focal point", "D. Active canvas"], correct: 0},
+                {question: "10. In graphic reproduction, converting continuous tonal gradients into a grid of tiny ink dots is:", options: ["A. Halftoning", "B. Pixilation", "C. Vectorization", "D. Color separation"], correct: 0}
+            ],
+            'General Knowledge in Art': [
+                {question: "1. The analytical search examining structural relationships, aesthetics, themes, and styles in a craft is:", options: ["A. Art Appreciation", "B. Fine Art draft", "C. Museum listing", "D. Art history listing"], correct: 0},
+                {question: "2. In visual compositions, the principle of design that relates to of focal target importance is:", options: ["A. Emphasis / Focal Point", "B. Symmetrical Balance", "C. Contrast intensity", "D. Rhythm loops"], correct: 0},
+                {question: "3. Ancient Egyptian pictorial writing symbols carved on tomb walls are known as:", options: ["A. Hieroglyphics", "B. Cuneiform", "C. Pictograms", "D. Calligraphy"], correct: 0},
+                {question: "4. Which Ghanaian traditional handcrafted textile is woven using silk strips containing symbolic patterns?", options: ["A. Kente fabric", "B. Adinkra print", "C. tie and dye", "D. Batakari smock"], correct: 0},
+                {question: "5. The professional acts of organizing, labeling, mounting, and displaying art works in galleries is:", options: ["A. Exhibition curation", "B. Art appreciation", "C. Studio maintenance", "D. Visual merchandising"], correct: 0},
+                {question: "6. To prevent respiratory health hazards in art workshops, what safety measure is most critical?", options: ["A. Installing active extraction ventilation systems", "B. Wearing standard hand surgical gloves", "C. Keeping chemicals in dark rooms", "D. Shorter workshop times"], correct: 0},
+                {question: "7. Which major European art movement (ca. 14th-17th Century) emphasized classical proportions, humanism, and perspective?", options: ["A. Renaissance", "B. Impressionism", "C. Dadaism", "D. Expressionism"], correct: 0},
+                {question: "8. A professional designer specializing in building stage props, lighting, and scenery setups for theater is a:", options: ["A. Scenographer", "B. Art curator", "C. Graphic illustrator", "D. Fine artist"], correct: 0},
+                {question: "9. Akan linguist staffs crafted by traditional woodworkers are finished by applying what coating?", options: ["A. Gold leaf gilding", "B. Scented palm oil", "C. Metallic rust paint", "D. Raw enamel shells"], correct: 0},
+                {question: "10. Which legal frame protects an artist's original visual works from unauthorized commercial prints?", options: ["A. Copyright law", "B. Business patent", "C. Trade secret treaty", "D. Trademark logo registration"], correct: 0}
+            ],
+            'Textiles': [
+                {question: "1. Textile fibers derived directly from sheep fleece or silkworm cocoons are categorized as:", options: ["A. Protein natural fibers", "B. Mineral natural fibers", "C. Cellulose natural fibers", "D. Synthetic polymers"], correct: 0},
+                {question: "2. The process of converting loose carded fiber balls into continuous yarn threads is:", options: ["A. Spinning", "B. Weaving", "C. Knitting", "D. Felting"], correct: 0},
+                {question: "3. In tie and dye craft, creating patterns by folding fabrics and stitching tightly with twine is a:", options: ["A. Stitch-resist technique", "B. Wax-resist method", "C. Stencil masking", "D. Screen printing design"], correct: 0},
+                {question: "4. What represents the primary wax composition used to draw templates in African batik crafts?", options: ["A. Paraffin wax and beeswax blend", "B. Synthetic liquid glue", "C. Melted animal lard", "D. Diluted starch gel"], correct: 0},
+                {question: "5. In screen printing, what chemical agent is exposed to UV light to prepare stencils on the mesh?", options: ["A. Photo-emulsion and sensitizer", "B. Scented kerosene thinning", "C. Saturated salt mordant", "D. Vat dye compounds"], correct: 0},
+                {question: "6. Which textile finishing process exposes cotton fabrics to sodium hydroxide to increase luster?", options: ["A. Mercerization", "B. Calendering press", "C. Singeing fluffs", "D. Sanforizing pre-shrunk"], correct: 0},
+                {question: "7. A chemical substance applied alongside a dye to bind color pigments permanently to fibers is:", options: ["A. Mordant", "B. Sensitizer", "C. Bleach helper", "D. Wax resist"], correct: 0},
+                {question: "8. Traditional Adinkra printing blocks in Ghana are carved from which natural material?", options: ["A. Calabash gourd shells", "B. Mahogany wood bases", "C. Soft modeling clay", "D. Solder metals"], correct: 0},
+                {question: "9. On a traditional weaving loom, what is the frame holding the heddles that separate warp threads?", options: ["A. Harness", "B. Shuttle shuttle", "C. Warp beam", "D. Reed comb"], correct: 0},
+                {question: "10. The parameter measuring the ability of dyed fabrics to retain their color under washing or sun exposures is:", options: ["A. Colorfastness", "B. Tensile capacity", "C. Fiber counts", "D. Thread density"], correct: 0}
+            ],
+            'Picture Making': [
+                {question: "1. Which shading technique represents light values by drawing closely packed parallel lines?", options: ["A. Hatching", "B. Stippling", "C. Smudging", "D. Blending"], correct: 0},
+                {question: "2. Which fast-drying painting medium employs water-soluble acrylic polymer emulsion as binder?", options: ["A. Acrylic paint", "B. Oil paint", "C. Watercolors", "D. Tempera egg paint"], correct: 0},
+                {question: "3. In linear perspective drawing, the line where Earth meets sky is referred to as:", options: ["A. Horizon line", "B. Vanishing point", "C. Orthogonal line", "D. Baseline scale"], correct: 0},
+                {question: "4. The classical framing layout rule dividing picture plane into a grid of 9 equal segments is:", options: ["A. Rule of Thirds", "B. Golden Ratio design", "C. Symmetrical alignment", "D. Focal point center"], correct: 0},
+                {question: "5. A fine art printmaking technique where design is carved in a rubber block and printed from surface is:", options: ["A. Linocut / Relief print", "B. Etching drypoint", "C. Lithographic grease", "D. Serigraphy silk"], correct: 0},
+                {question: "6. A picture created by adhering distinct materials like newspaper, fabric, and leaves on a canvas is:", options: ["A. Collage", "B. Mosaic", "C. Fresco mural", "D. Tempera panel"], correct: 0},
+                {question: "7. Why must a raw artist canvas board be sized and primed with gesso before oil painting?", options: ["A. Prevents acidic oils from rotting canvas fibers & creates smooth surface", "B. Ensures fast drying times under sun", "C. Generates a bright neon paint", "D. Makes the canvas completely transparent"], correct: 0},
+                {question: "8. The safest solvent to clean brushes after using turpentine-based fine artist oil paints is:", options: ["A. Mineral spirits followed by soapy water", "B. Diluted hydrochloric acid", "C. Pure industrial acetone thins", "D. Running tap water only"], correct: 0},
+                {question: "9. In portrait sketching, what represents the standard midway line of vertical head heights?", options: ["A. Eye level line", "B. Nose bridge line", "C. Lower lip fold", "D. Eyebrow boundary"], correct: 0},
+                {question: "10. What represents the technique of applying pigments to fresh damp lime plaster on walls?", options: ["A. Buon Fresco", "B. Fresco Secco", "C. Tempera paneling", "D. Acrylic muraling"], correct: 0}
+            ],
+            'Sculpture': [
+                {question: "1. Which sculpture method is classified as subtractive, involving chipping material away from block?", options: ["A. Carving", "B. Modeling", "C. Casting", "D. Assembling"], correct: 0},
+                {question: "2. The critical step of working clay with hands to expel air bubbles and achieve consistency before modeling is:", options: ["A. Wedging", "B. Firing", "C. Glazing", "D. Slip pouring"], correct: 0},
+                {question: "3. The sharp, double-bevel woodworking chisel used primarily by wood carvers is a:", options: ["A. Gouge/chisels set", "B. Surform rasp", "C. Tenon saw edge", "D. Mortise mallet"], correct: 0},
+                {question: "4. A compound that sets fast when mixed with water and is widely used to build protective cast molds is:", options: ["A. Plaster of Paris (P.O.P)", "B. Portland gray cement", "C. Liquid silicone", "D. Pulverized kaolin clay"], correct: 0},
+                {question: "5. The internal skeletal framework built using wire or wood to support heavy modeled clay figures is:", options: ["A. Armature", "B. Scaffold", "C. Casting flask", "D. Slip frame"], correct: 0},
+                {question: "6. The distinctive chemical coating applied to metal sculptures to alter color and texture is:", options: ["A. Patina", "B. Clear varnish", "C. Lacquer glaze", "D. Base primer"], correct: 0},
+                {question: "7. A sculpture designed with figures raising prominently but resting on a flat backing stone is a:", options: ["A. Relief sculpture", "B. Free-standing statue", "C. Kinetic mobile", "D. Assemblage collage"], correct: 0},
+                {question: "8. A sculpture styled using suspended balancing shapes that rotate dynamically in wind currents is a:", options: ["A. Mobile kinetic sculpture", "B. Maquette draft", "C. relief carving", "D. Monumental installation"], correct: 0},
+                {question: "9. To fire traditional modeled clay pots, they must first be completely air-dried and heated slowly in a:", options: ["A. Kiln", "B. Industrial stove", "C. Smelting furnace", "D. Drying cabinet"], correct: 0},
+                {question: "10. Site-specific sculptures crafted using soil, logs, boulders, and organic elements of site are:", options: ["A. Earthworks / Land art", "B. relief carvings", "C. Bronzecast structures", "D. Maquettes installations"], correct: 0}
+            ],
+            'General Agriculture': [
+                {question: "1. The agricultural branch which studies soil crop management and field agronomic solutions is:", options: ["A. Agronomy", "B. Animal science", "C. Extension studies", "D. Farm mechanics"], correct: 0},
+                {question: "2. The traditional land ownership model in Ghana where lands are held by heads of clans/stool chiefs is:", options: ["A. Communal land tenure", "B. Leasehold tenure system", "C. Freehold state title", "D. Government allocation system"], correct: 0},
+                {question: "3. Which primary tractor-mounted implement is utilized to fracture and invert soil in land preparations?", options: ["A. Disc plow", "B. harrow builder", "C. Ridger moulder", "D. Seed planter"], correct: 0},
+                {question: "4. Soil texture classifications analyze relative percentage distributions of which soil particles?", options: ["A. Sand, silt, and clay", "B. Organic compost and microbes", "C. nitrogen, potassium, calcium", "D. Water, air, and rock gravels"], correct: 0},
+                {question: "5. Which irrigation system operates with maximum water conservation, dropping water straight to plant roots?", options: ["A. Drip irrigation", "B. Sprinkler system", "C. Flood basin lines", "D. Furrow channel runs"], correct: 0},
+                {question: "6. The process of transferring modern farming techniques from research centers to local smallholder fields is:", options: ["A. Agricultural extension", "B. Agronomic surveying", "C. Crop mechanization", "D. Agroforestry logistics"], correct: 0},
+                {question: "7. A collective register showing all farm assets, liabilities, and net worth at a specific date is:", options: ["A. Farm Balance Sheet", "B. Cash log register", "C. Enterprise budget sheet", "D. Depreciation ledger"], correct: 0},
+                {question: "8. How do contact chemical herbicides differ from systemic herbicide compounds?", options: ["A. Contact kills only tissue it touches; systemic absorbs and translocation kills entire weeds", "B. Systemic works only on crop trees", "C. Contact is fully organic", "D. Systemic requires soil mixing"], correct: 0},
+                {question: "9. What describes a farming method where arable crops are grown alongside perennial forestry trees?", options: ["A. Agroforestry", "B. Mixed farming", "C. Mono-cropping layout", "D. Pastoral nomadism"], correct: 0},
+                {question: "10. The progressive change of greenhouse gas layers warming atmospheres is shifting West African crop cycles by:", options: ["A. Inducing unpredictable rains and droughts", "B. Doubling annual cocoa land sizes", "C. Eliminating all common crop insects", "D. Lowering average temperatures"], correct: 0}
+            ],
+            'Crop Husbandry': [
+                {question: "1. The crop care step where container plants are exposed to sun to survive field shocks before transplanting is:", options: ["A. Hardening off", "B. Pruning foliage", "C. Mulching beds", "D. Thinning rows"], correct: 0},
+                {question: "2. Which crop plant type is primarily grown in rotational farming to fix nitrogen into soils via root nodules?", options: ["A. Legumes (beans / cowpeas)", "B. Cereals (corn / millet)", "C. Root tubers (yam / cassava)", "D. Cash crops (rubber)"], correct: 0},
+                {question: "3. The primary fungal crop disease that causes rotting of cocoa tree pods in rainy seasons in Ghana is:", options: ["A. Black Pod disease", "B. Swollen Shoot virus", "C. Panama root wilts", "D. Maize rust spots"], correct: 0},
+                {question: "4. The dynamic pattern of planting different crop families in a planned sequence on the same field is:", options: ["A. Crop Rotation", "B. Mono-cropping", "C. Mixed cropping", "D. Intercropping"], correct: 0},
+                {question: "5. How is physiological maturity determined in harvested Ghanaian white yam crops?", options: ["A. When foliage leaves turn yellow and dry up naturally", "B. When subterranean tubers rot completely", "C. By counting distinct root branches", "D. By visual skin checks"], correct: 0},
+                {question: "6. Which vegetative propagation technique involves joining a shoot bud of a variety to root stock of another?", options: ["A. Budding / Grafting", "B. Air layering branch", "C. Softwood node cutting", "D. Tissue micropropagation"], correct: 0},
+                {question: "7. For proper long-term silo storage of maize grains, moisture content must be dried below:", options: ["A. 12% to 14%", "B. Exactly 25%", "C. Zero percent", "D. At least 40%"], correct: 0},
+                {question: "8. A greenhouse and hydroponic farming setup primarily allows a grower to:", options: ["A. Control microclimate and feed plants dissolved nutrients in water without soil", "B. Evade paying state agricultural taxes", "C. Eliminate use of tractor plows", "D. Exclusively grow tree crops"], correct: 0},
+                {question: "9. Which insect pest attacks maize plants by boring tunnels inside structural grass stalks?", options: ["A. Maize stem borer", "B. Green aphid flies", "C. cotton stainer bug", "D. White grub worm"], correct: 0},
+                {question: "10. The primary purpose of putting a grass shade over a young nursery seedbed is to:", options: ["A. Protect seedlings from excessive temperature and heavy rain washings", "B. Attract beneficial crop-pollinating insects", "C. Prevent entry of carbon dioxide gas", "D. Hide crops from bird pests"], correct: 0}
+            ],
+            'Animal Husbandry': [
+                {question: "1. Which stomach chamber in a ruminant animal contains billions of microbes to ferment plant fibers?", options: ["A. Rumen", "B. Reticulum", "C. Omasum", "D. Abomasum"], correct: 0},
+                {question: "2. The poultry housing model where birds are held inside secure wire cages, with feed/egg tunnels is:", options: ["A. Battery cage system", "B. Deep litter house", "C. Semi-intensive yard", "D. Free range field"], correct: 0},
+                {question: "3. Which disease is a severe tick-borne blood parasite infection affecting cattle in West Africa?", options: ["A. Heartwater / Babesiosis", "B. Newcastle disease", "C. Swine flu fever", "D. Avian bird flu"], correct: 0},
+                {question: "4. Raw livestock feeds that are high in bulk fiber fractions but low in digestible nutrients are:", options: ["A. Roughages", "B. Concentrates", "C. Feed additives", "D. Vitamin supplements"], correct: 0},
+                {question: "5. The biological state of reproductive receptivity during which a female farm animal accepts mating is:", options: ["A. Estrus / Heat", "B. Gestation cycle", "C. Parturition labor", "D. Lactation peak"], correct: 0},
+                {question: "6. Which animal disease is a highly contagious bacterial infection causing sudden death and bleeding?", options: ["A. Anthrax", "B. Foot and Mouth disease", "C. Coccidiosis", "D. Brucellosis"], correct: 0},
+                {question: "7. In swine management, why are clean piggeries gutter washings and disinfection necessary?", options: ["A. Prevents parasite infestations like roundworms and maintains animal hygiene", "B. Speeds up pig gestation periods", "C. Attracts buyers during auctions", "D. Lowers swine feed costs"], correct: 0},
+                {question: "8. Formulating feed rations containing balanced proportions of proteins, energy, and minerals is:", options: ["A. Balanced Ration", "B. Maintenance Feed", "C. Ad-libitum feeding", "D. Mineral block supplement"], correct: 0},
+                {question: "9. The artificial introduction of high-grade semen into female reproductive tracts is:", options: ["A. Artificial Insemination", "B. Cross-breeding selection", "C. embryo embryo implants", "D. Inbreeding line"], correct: 0},
+                {question: "10. In pond aquaculture, standard catfish/tilapia feeds are manufactured to float on surface because:", options: ["A. Allows monitoring of animal feeding habits & keeps ponds cleaner", "B. Catfish lack oxygen underneath", "C. Feed requires sun exposure to decompose", "D. Tilapia cannot descend deep"], correct: 0}
+            ],
+            'Applied Electricity': [
+                {question: "1. The physical parameter of an electrical conductor representing resistance to alternating current is:", options: ["A. Impedance (Z)", "B. Resistance (R)", "C. Reactance (X)", "D. Conductance (G)"], correct: 0},
+                {question: "2. An ideal step-down transformer has primary turns of 1000 and secondary turns of 100. If input V = 240V, output V is:", options: ["A. 24 V", "B. 2400 V", "C. 120 V", "D. 12 V"], correct: 0},
+                {question: "3. Which semiconductor electronic component is utilized to convert alternating current into direct current?", options: ["A. Diode", "B. Resistor", "C. Inductor", "D. Capacitor"], correct: 0},
+                {question: "4. The peak value of an AC voltage wave is 311V. Estimate the Root Mean Square (RMS) value.", options: ["A. 220 V", "B. 311 V", "C. 440 V", "D. 110 V"], correct: 0},
+                {question: "5. In electrical safety codes, which colored wire is universally designed to run grounding earth flows?", options: ["A. Green or Green/Yellow stripes", "B. Solid deep red", "C. Solid black live", "D. White neutral"], correct: 0},
+                {question: "6. The parameter that opposes rapid changes in circuit current flows, storing magnetic energy is:", options: ["A. Inductor", "B. Capacitor", "C. Resistor", "D. Transistor"], correct: 0},
+                {question: "7. Which tool can check waveforms, measure peak frequencies, and analyze distortion curves?", options: ["A. Oscilloscope", "B. Analog wheatstone bridge", "C. digital clamp meter", "D. Simple line tester"], correct: 0},
+                {question: "8. How is a Ground Fault Circuit Interrupter (GFCI) protective device designed to function?", options: ["A. Cuts power when current imbalance is detected between hot and neutral wires", "B. Resists minor power surges", "C. Boosts circuit average operating voltage", "D. Regulates induction transformer temperatures"], correct: 0},
+                {question: "9. Calculate total parallel capacitance of two capacitors (10 µF and 20 µF) connected together.", options: ["A. 30 µF", "B. 6.67 µF", "C. 10 µF", "D. 15 µF"], correct: 0},
+                {question: "10. A complete rectifier circuit utilizing 4 diodes organized to invert full AC wave cycles is a:", options: ["A. Bridge Rectifier", "B. Half-wave rectifier", "C. Triode capacitor", "D. Voltage multiplier"], correct: 0}
+            ],
+            'Technical Drawing': [
+                {question: "1. In of orthographic projection, what symbol designates first-angle projection layouts?", options: ["A. Cone frustum alongside concentric circles", "B. Isolated pyramid side profiles", "C. Parallel projection lines", "D. Circle containing diameter cross"], correct: 0},
+                {question: "2. The angle at which isometric drawing projection lines tilt up from the horizontal baseline is:", options: ["A. 30 degrees", "B. 45 degrees", "C. 60 degrees", "D. 15 degrees"], correct: 0},
+                {question: "3. What represents the true geometric shape generated by opening/unfolding a hollow cone on a flat page?", options: ["A. Sector of a circle", "B. regular rectangle", "C. Concentric ring oval", "D. Regular triangle"], correct: 0},
+                {question: "4. Which technical line style is drawn to represent internal, hidden features of machine drawings?", options: ["A. Hidden / Dashed line", "B. Thin continuous scale line", "C. Chain dot center line", "D. Heavy outline"], correct: 0},
+                {question: "5. Computer-Aided Design (CAD) software packages utilize which tool to organize drawings logically?", options: ["A. Layers", "B. Slices", "C. Pixels", "D. Stencils"], correct: 0},
+                {question: "6. Bisecting an angle of 90 degrees produces which angles in geometric technical drafting?", options: ["A. Two 45 degree angles", "B. Three 30 degree angles", "C. One 60 and 30 degree angle", "D. Four 22.5 degree angles"], correct: 0},
+                {question: "7. What represents the primary function of auxiliary projection views in machine drawings?", options: ["A. Shows the true shape of inclined surfaces", "B. Provides decorative backgrounds", "C. Details material specifications", "D. Encharges coordinate dimensions"], correct: 0},
+                {question: "8. Which drawing scale indicates that features on page are drawn at half their actual physical size?", options: ["A. Scale 1 : 2", "B. Scale 2 : 1", "C. Scale 1 : 1", "D. Scale 1 : 50"], correct: 0},
+                {question: "9. The conventional symbol utilized on architectural floor plans to indicate a standard swing door is:", options: ["A. A line indicating opening accompanied by arc indicating swing path", "B. Solid heavy brick cross pattern", "C. Parallel line hatch layers", "D. Hexagonal block"], correct: 0},
+                {question: "10. In standard machine drawing, sectional views show internal profiles by cutting along a plane and painting:", options: ["A. Hatched thin lines at 45 degrees", "B. Solid dark black shadows", "C. Dotted gradient fields", "D. Yellow alerts"], correct: 0}
+            ],
+            'Woodwork': [
+                {question: "1. Timber sapwood tissue differs from heartwood tissue primarily because sapwood is:", options: ["A. Active living wood that conducts water and nutrients; heartwood is inactive and stronger", "B. Termite proof and much darker in color", "C. Lacking growth rings", "D. Saturated with oil layers"], correct: 0},
+                {question: "2. The timber seasoning method that dries logs fast using regulated heat and stream chambers is:", options: ["A. Kiln seasoning", "B. Natural air drying", "C. Water saturation storage", "D. Chemical solvent thins"], correct: 0},
+                {question: "3. Which woodwork wood joints represents overlapping interlocking fingers widely used to frame drawers?", options: ["A. Dovetail joint", "B. Bridle joint", "C. Mortise and tenon", "D. Butt joint"], correct: 0},
+                {question: "4. A woodwork hand saw specialized in cutting fine curvatures in thin plywood panel sheets is a:", options: ["A. Coping saw", "B. Tenon saw", "C. Rip saw", "D. Crosscut saw"], correct: 0},
+                {question: "5. To join wood structures permanently using water-soluble white liquid adhesive, woodwork uses:", options: ["A. Polyvinyl acetate (PVA) craft glue", "B. Urea-formaldehyde chemical powders", "C. Hot rubber hot glues", "D. Contact neoprene thins"], correct: 0},
+                {question: "6. Which woodwork machine is specialized in cutting timber logs straight along the wood grain?", options: ["A. Rip saw / Band saw", "B. Lathe center turner", "C. Drill press", "D. Surface planer"], correct: 0},
+                {question: "7. Correct steps of finishing a mahogany wood surface to a glossy shine require:", options: ["A. Scraping, sandpapering, wood staining, and lacquering", "B. Sanding, water soaking, and raw paint coats", "C. Direct wire brushing followed by palm oil coatings", "D. Steel wool sweeps only"], correct: 0},
+                {question: "8. The ironmongery item utilized on woodwork cabinet frames to connect doors allowing rotation is:", options: ["A. Hinge", "B. Drawer runner", "C. Cabinet handle", "D. Magnetic catch"], correct: 0},
+                {question: "9. To construct dynamic workshop environments, woodwork layout must contain active:", options: ["A. Dust extraction systems", "B. Paint storage cabinets", "C. Air humidification pipes", "D. Isolated tool centers"], correct: 0},
+                {question: "10. Adding springs, foam padding layers, and fabrics onto open timber stool seats is:", options: ["A. Upholstery", "B. Veneering panels", "C. Wood staining decoration", "D. Ironmongery mounting"], correct: 0}
+            ],
+            'Metalwork': [
+                {question: "1. Which alloying composition creates structural brass metals from raw elements?", options: ["A. Copper and Zinc", "B. Iron and Carbon", "C. Aluminum and Copper", "D. Tin and Lead"], correct: 0},
+                {question: "2. The heat treatment process of heating steel to redness followed by slow cooling in sand is:", options: ["A. Annealing", "B. Hardening", "C. Tempering", "D. Quenching"], correct: 0},
+                {question: "3. Which precise measuring gauge reads values down to 0.01 mm using thimble scales?", options: ["A. Micrometer caliper", "B. Dial vernier caliper", "C. Steel rule stick", "D. Thread pitch gauge"], correct: 0},
+                {question: "4. The metalwork bench operation that cuts internal threads inside drilled cylinder holes is:", options: ["A. Tapping", "B. Thread die cutting", "C. Reaming sweeps", "D. Counter-boring counters"], correct: 0},
+                {question: "5. In sheet metal works, joining thin iron planes together by folding overlapping borders is a:", options: ["A. Grooved seam", "B. Riveted joint", "C. Arc welded run", "D. Soft solder line"], correct: 0},
+                {question: "6. On a precision metalworking lathe, the core operation of cutting faces flat and perpendicular to axis is:", options: ["A. Facing", "B. Turning", "C. Knurling", "D. Threading"], correct: 0},
+                {question: "7. Why must metal arc welders wear thick dark viewing glass filters when welding?", options: ["A. Protects eyes from dangerous ultraviolet light radiations", "B. Filters hot metallic welding smoke", "C. Lowers average workshop temperatures", "D. Enhances mechanical focus"], correct: 0},
+                {question: "8. The wet sand mixture utilized systematically inside foundry flasks to cast metals is:", options: ["A. Green sand (silica + clay + moisture)", "B. Pure modeling plaster", "C. Coarse building aggregates", "D. Dry Portland cement"], correct: 0},
+                {question: "9. The process of coating steel items with layer of molten zinc to prevent corrosion is:", options: ["A. Galvanizing", "B. Electroplating chrome", "C. Blackening heat", "D. Solder coating"], correct: 0},
+                {question: "10. Which metalwork file profile is specialized in producing curves and circular holes?", options: ["A. Half-round or round file", "B. Flat single-cut file", "C. Triangular file", "D. Square rasp"], correct: 0}
+            ],
+            'Building Construction': [
+                {question: "1. Which soil exploratory test determines safe weight-bearing capabilities before building foundations?", options: ["A. Trial pit / soil bearing capacity test", "B. Sedimentation checks", "C. Core drilling only", "D. Visual clay surveys"], correct: 0},
+                {question: "2. Which foundation type is best suited to distribute heavy loads over weak clay soil beds using thick slabs?", options: ["A. Raft foundation", "B. Strip foundation", "C. Pad foundation", "D. Pier foundation"], correct: 0},
+                {question: "3. What represents the standard volumetric ratio mix of cement, sand, and stone used for reinforced concrete?", options: ["A. 1 : 2 : 4", "B. 1 : 3 : 6", "C. 1 : 1 : 2", "D. 1 : 4 : 8"], correct: 0},
+                {question: "4. In traditional masonry, brickwork laid alternating rows of headers and stretchers is:", options: ["A. English Bond", "B. Flemish Bond", "C. Stretcher Bond", "D. Header Bond"], correct: 0},
+                {question: "5. To prevent horizontal groundwater seepages rising from foundations into mud bricks, building construction uses:", options: ["A. Damp-Proof Course (DPC) felt layer", "B. Extra thick sand screeding", "C. Hydraulic paint sprays", "D. Foundation drainage channels"], correct: 0},
+                {question: "6. The timber structural member in a kingpost roof truss that supports common rafters longitudinally is are:", options: ["A. Purlins", "B. Tie beams", "C. Struts", "D. Wall plates"], correct: 0},
+                {question: "7. Scaffolding structures built to carry construction workers working at heights must compile with:", options: ["A. Steel frame clamp safety standards and bracing", "B. Rope ties on dynamic poles", "C. Simple loose timber boxes", "D. Floor board layouts"], correct: 0},
+                {question: "8. The sand-cement plaster finish screen applied on interior floor concrete to provide smooth texture is:", options: ["A. Screed", "B. Render", "C. Plaster board", "D. Underlayment coat"], correct: 0},
+                {question: "9. In plumbing septic tank installations, sewerage pipes must descend at what gradient tilt angle?", options: ["A. Gradual gradient slope (1 in 40 to 1 in 100)", "B. Vertically straight down", "C. Flat structural levels", "D. Steep tilt curves"], correct: 0},
+                {question: "10. Which architectural concrete member is cast horizontally over door or window openings to hold brick loads?", options: ["A. Lintel", "B. Plinth", "C. Sills", "D. Beams"], correct: 0}
+            ],
+            'Computing': [
+                {question: "1. A programmer has indented the codes in the program being written. The purpose of the indentation is to", options: ["A. make the code difficult to read by users.", "B. hide the code from others when writing it.", "C. create bugs in the program to disturb the codes.", "D. show the start and end of a conditional statement."], correct: 3},
+                {question: "2. At the Internet cafe, Kofi connected his laptop to the Internet without using cable and Akua also connected her laptop to the Internet using cable. An example of Akua's connection type is", options: ["A. Infrared", "B. Bluetooth", "C. Wi-Fi adaptor", "D. Ethernet adapter"], correct: 3},
+                {question: "3. In a group presentation, a group was to demonstrate how to insert an online video into a slide they have created. The first step to be considered by the group is to click on the", options: ["A. Insert tab.", "B. Design tab.", "C. Online video.", "D. Download video."], correct: 0},
+                {question: "4. A man shared his property to his children and wife in a particular ratio. The most appropriate chart type that can be used to represent the sharing of the property is", options: ["A. pie chart.", "B. bar chart.", "C. line chart.", "D. scatter chart."], correct: 0},
+                {question: "5. Robotic systems have components that relates to the functioning of the human organs. The component of the robot that acts like the human brain is the", options: ["A. motors.", "B. sensors.", "C. batteries.", "D. controllers."], correct: 3},
+                {question: "6. Which logical gate yields an output of 1 only if all input channels are simultaneously 1?", options: ["A. AND Gate", "B. OR Gate", "C. NOT Gate", "D. XOR Gate"], correct: 0},
+                {question: "7. In computer filesystems, what represents the primary folder path that contains all subdirectories?", options: ["A. Root directory", "B. Desktop folder", "C. System32 cabinet", "D. Downloads archive"], correct: 0},
+                {question: "8. Which network layout connects all computers individually to a central hubs or switch?", options: ["A. Star topology", "B. Ring topology", "C. Bus network", "D. Mesh matrix"], correct: 0},
+                {question: "9. What describes checking computer programs systematically to locate, isolate, and fix software bug errors?", options: ["A. Debugging", "B. Compiling", "C. Defragmenting", "D. Code encryption"], correct: 0},
+                {question: "10. In database architectures, which parameter holds completely unique values to identify each row in a table?", options: ["A. Primary Key", "B. Foreign Key", "C. Candidate Field", "D. Unique index"], correct: 0}
+            ]
+        };
+
+        // Inject alias maps for seamless routing
+        allWassceQuestions['Mathematics'] = allWassceQuestions['Core Mathematics'];
+        allWassceQuestions['Christian/Islamic Religious Studies (CRS/IRS)'] = allWassceQuestions['Christian/Islamic Religious Studies (CRS/IRS)'];
+        allWassceQuestions['Textiles'] = allWassceQuestions['Textiles'];
+
+        // Determine currently selected subject and load its question bank
+        const activeSubjectSelection = localStorage.getItem('selectedSubject') || 'Core Mathematics';
+        let quizData = allWassceQuestions[activeSubjectSelection] || allWassceQuestions['Core Mathematics'];
 
         // Quiz variables
         let currentQuestionIndex = 0;
@@ -2196,6 +2627,436 @@
         let markedQuestions = new Array(quizData.length).fill(false);
         let flaggedQuestions = new Array(quizData.length).fill(false);
         let flagDetails = new Array(quizData.length).fill(null);
+
+        // Core AI and Procedural unique question generator
+        async function loadAndGenerateQuestions() {
+            const subject = localStorage.getItem('selectedSubject') || 'Core Mathematics';
+            
+            // Show dynamic glassmorphic loading UI
+            showGenerationLoadingUI(subject);
+            
+            try {
+                // Try fetching unique questions from Gemini-3.5-Flash
+                const aiQuestions = await fetchAIQuestions(subject);
+                if (aiQuestions && aiQuestions.length === 10) {
+                    quizData = aiQuestions;
+                    console.log('✨ Brand-new, unique questions generated dynamically via Gemini AI!');
+                    hideGenerationLoadingUI();
+                    return;
+                }
+            } catch (err) {
+                console.warn('⚠️ Gemini AI dynamic generation timed out or failed. Falling back to local procedural variation engine...', err);
+            }
+            
+            // Local fallback generator
+            quizData = buildLocalUniqueQuiz(subject);
+            console.log('🎲 Unique quiz questions generated procedurally with math variation & option shuffling!');
+            hideGenerationLoadingUI();
+        }
+
+        function showGenerationLoadingUI(subject) {
+            const container = document.getElementById('quiz-container');
+            if (!container) return;
+            
+            let loader = document.getElementById('dynamic-exam-loader');
+            if (loader) return;
+            
+            container.style.position = 'relative';
+            
+            loader = document.createElement('div');
+            loader.id = 'dynamic-exam-loader';
+            loader.className = 'absolute inset-0 z-50 rounded-lg bg-white/95 dark:bg-gray-850/95 backdrop-blur-md flex flex-col justify-center items-center p-6 text-center transition-all duration-300';
+            loader.innerHTML = `
+                <div class="relative mb-6">
+                    <div class="w-16 h-16 rounded-full border-4 border-blue-100 dark:border-blue-900 border-t-blue-500 animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Formulating Unique Exam</h3>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm">
+                    AI Study Assistant is compiling a brand-new, unique 10-question <span class="text-blue-600 dark:text-blue-400 font-semibold">${subject}</span> exam with unique scenarios...
+                </p>
+                <div class="mt-6 flex items-center space-x-2 text-xs text-gray-400 dark:text-gray-500">
+                    <span>✨ WASSCE Standard Syllabus</span>
+                    <span>•</span>
+                    <span>⚡ Safe Session Sync</span>
+                </div>
+            `;
+            container.appendChild(loader);
+        }
+
+        function hideGenerationLoadingUI() {
+            const loader = document.getElementById('dynamic-exam-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.remove();
+                }, 300);
+            }
+        }
+
+        async function fetchAIQuestions(subject) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 seconds limit
+            
+            try {
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=AIzaSyAxbcCYlka4tI_Uu-Vc6A4ErCjAORaGhDo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `Generate exactly 10 unique, highly realistic, and accurate multiple-choice exam questions for West African Senior School Certificate Examination (WASSCE) for the subject "${subject}".
+Each question must follow excellent pedagogical standards, have exactly 4 credible choices, and a valid correct index.
+
+Return strictly a valid JSON array of objects conforming to this schema (and NO other text, NO wrapping markdown backticks, NO "json" prefix):
+[
+  {
+    "question": "1. [Full text of the question]",
+    "options": ["A. [Choice A]", "B. [Choice B]", "C. [Choice C]", "D. [Choice D]"],
+    "correct": 0
+  }
+]
+
+Requirements:
+- Ensure the questions align with the professional WASSCE syllabus for ${subject}.
+- The options array for each question MUST have exactly 4 strings starting with prefixes "A. ", "B. ", "C. ", and "D. ".
+- The "correct" value must be a number between 0 and 3, corresponding to the correct answer.
+- Make the questions highly unique, distinct from standard defaults, with varied scenarios and numbers.`
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            responseMimeType: "application/json"
+                        }
+                    })
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`Gemini API returned status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                    let text = data.candidates[0].content.parts[0].text.trim();
+                    if (text.includes('```json')) {
+                        text = text.replace(/.*?```json\s*/, '').replace(/\s*```.*/, '');
+                    } else if (text.includes('```')) {
+                        text = text.replace(/.*?```\s*/, '').replace(/\s*```.*/, '');
+                    }
+                    
+                    const parsed = JSON.parse(text);
+                    if (Array.isArray(parsed) && parsed.length === 10) {
+                        const validated = parsed.map((q, idx) => {
+                            const num = idx + 1;
+                            let qText = q.question;
+                            if (!/^\d+\./.test(qText)) {
+                                qText = `${num}. ${qText}`;
+                            }
+                            let opts = Array.isArray(q.options) ? q.options : ['A.', 'B.', 'C.', 'D.'];
+                            if (opts.length < 4) {
+                                while (opts.length < 4) opts.push('');
+                            }
+                            const prefixes = ['A. ', 'B. ', 'C. ', 'D. '];
+                            const cleanedOpts = opts.slice(0, 4).map((o, oIdx) => {
+                                let optVal = String(o);
+                                if (optVal.startsWith('A. ') || optVal.startsWith('B. ') || optVal.startsWith('C. ') || optVal.startsWith('D. ')) {
+                                    optVal = optVal.substring(3);
+                                }
+                                return prefixes[oIdx] + optVal;
+                            });
+                            
+                            let correctIdx = parseInt(q.correct, 10);
+                            if (Number.isNaN(correctIdx) || correctIdx < 0 || correctIdx > 3) {
+                                correctIdx = 0;
+                            }
+                            
+                            return {
+                                question: qText,
+                                options: cleanedOpts,
+                                correct: correctIdx
+                            };
+                        });
+                        return validated;
+                    }
+                }
+            } catch (e) {
+                console.warn('AI question fetch error:', e);
+            }
+            return null;
+        }
+
+        function buildLocalUniqueQuiz(subject) {
+            const originalList = allWassceQuestions[subject] || allWassceQuestions['Core Mathematics'];
+            let questions = JSON.parse(JSON.stringify(originalList));
+            
+            questions.forEach((q, idx) => {
+                if (subject === 'Core Mathematics' || subject === 'Mathematics') {
+                    if (idx === 0) {
+                        try {
+                            const baseNums = [12, 18, 24];
+                            const chosenBase = baseNums[Math.floor(Math.random() * baseNums.length)];
+                            const multiNums = [2, 3, 4];
+                            const chosenMulti = multiNums[Math.floor(Math.random() * multiNums.length)];
+                            
+                            const factors = [];
+                            for (let f = 1; f <= chosenBase; f++) {
+                                if (chosenBase % f === 0) factors.push(f);
+                            }
+                            const multiples = [];
+                            for (let m = chosenMulti; m < 20; m += chosenMulti) {
+                                multiples.push(m);
+                            }
+                            const intersection = factors.filter(x => multiples.includes(x)).sort((a,b)=>a-b);
+                            const intersectionStr = `{${intersection.join(', ')}}`;
+
+                            q.question = `1. Given that set P = {x : x is a factor of ${chosenBase}} and Q = {x : x is a multiple of ${chosenMulti} less than 20}, find P ∩ Q.`;
+                            const alt1 = `{${factors.slice(0, 3).join(', ')}}`;
+                            const alt2 = `{${multiples.slice(0, 3).join(', ')}}`;
+                            const alt3 = `{${intersection.concat([chosenBase]).filter((v,i,a)=>a.indexOf(v)===i).join(', ')}}`;
+                            q.options = [`A. ${intersectionStr}`, `B. ${alt1}`, `C. ${alt2}`, `D. ${alt3}`];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 1) {
+                        try {
+                            const scales = [50000, 100000, 200000];
+                            const chosenScale = scales[Math.floor(Math.random() * scales.length)];
+                            const distances = [3.5, 4.5, 5.5, 8.0];
+                            const chosenDist = distances[Math.floor(Math.random() * distances.length)];
+                            const actualKm = (chosenDist * chosenScale) / 100000;
+
+                            q.question = `2. If a map is drawn to scale of 1 : ${chosenScale.toLocaleString()}, calculate the actual distance in km represented by ${chosenDist} cm on the map.`;
+                            q.options = [
+                                `A. ${actualKm} km`,
+                                `B. ${actualKm * 10} km`,
+                                `C. ${actualKm / 10} km`,
+                                `D. ${actualKm * 100} km`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 2) {
+                        try {
+                            const values = [0.000473, 0.000285, 0.000692, 0.000154];
+                            const val = values[Math.floor(Math.random() * values.length)];
+                            const coef = val * 1000000;
+                            const coefStr = (coef / 100).toFixed(2);
+
+                            q.question = `3. Express ${val} in standard scientific form.`;
+                            q.options = [
+                                `A. ${coefStr} × 10^-4`,
+                                `B. ${coefStr} × 10^-3`,
+                                `C. ${coefStr * 10} × 10^-5`,
+                                `D. ${coefStr} × 10^4`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 5) {
+                        try {
+                            const principals = [8000, 10000, 12000, 15000];
+                            const p = principals[Math.floor(Math.random() * principals.length)];
+                            const rates = [4.5, 5.0, 5.5, 6.0];
+                            const r = rates[Math.floor(Math.random() * rates.length)];
+                            const years = [2, 3, 4];
+                            const t = years[Math.floor(Math.random() * years.length)];
+                            const interest = (p * r * t) / 100;
+
+                            q.question = `6. Calculate the simple interest on GHS ${p.toLocaleString()} kept for ${t} years at ${r}% interest per year.`;
+                            q.options = [
+                                `A. GHS ${interest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                                `B. GHS ${(interest * 0.9).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                                `C. GHS ${(interest * 1.1).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                                `D. GHS ${(interest - 200).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 6) {
+                        try {
+                            const pairs = [[2,3], [3,4], [2,4], [3,5]];
+                            const chosen = pairs[Math.floor(Math.random() * pairs.length)];
+                            const r1 = chosen[0];
+                            const r2 = chosen[1];
+                            const b = r1 + r2;
+                            const c = r1 * r2;
+
+                            q.question = `7. Find the quadratic roots of the equation: x^2 - ${b}x + ${c} = 0.`;
+                            q.options = [
+                                `A. x = ${r1} or x = ${r2}`,
+                                `B. x = -${r1} or x = -${r2}`,
+                                `C. x = 1 or x = ${c}`,
+                                `D. x = -1 or x = -${c}`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 7) {
+                        try {
+                            const redCount = [4, 5, 6, 7];
+                            const r = redCount[Math.floor(Math.random() * redCount.length)];
+                            const blueCount = [3, 4, 5];
+                            const b = blueCount[Math.floor(Math.random() * blueCount.length)];
+                            const total = r + b;
+
+                            function gcd(x, y) {
+                                return y === 0 ? x : gcd(y, x % y);
+                            }
+                            const common = gcd(b, total);
+                            const num = b / common;
+                            const den = total / common;
+
+                            q.question = `8. A box holds ${r} red balls and ${b} blue balls. If a ball is picked at random, find the probability of choosing a blue ball.`;
+                            q.options = [
+                                `A. ${num}/${den}`,
+                                `B. ${total - b}/${total}`,
+                                `C. 1/${total}`,
+                                `D. ${b}/${total - 1}`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 9) {
+                        try {
+                            const heights = [7, 10, 14, 20];
+                            const h = heights[Math.floor(Math.random() * heights.length)];
+                            const radii = [7, 14];
+                            const rad = radii[Math.floor(Math.random() * radii.length)];
+                            const volume = Math.round((22 / 7) * rad * rad * h);
+
+                            q.question = `10. Calculate the total volume of a right cylinder with radius ${rad} cm and height ${h} cm. (Take pi = 22/7)`;
+                            q.options = [
+                                `A. ${volume} cm^3`,
+                                `B. ${Math.round(volume * 0.5)} cm^3`,
+                                `C. ${Math.round(volume * 1.5)} cm^3`,
+                                `D. ${Math.round(volume * 2)} cm^3`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    }
+                } else if (subject === 'Physics') {
+                    if (idx === 0) {
+                        try {
+                            const speeds = [10, 20, 30, 40];
+                            const s = speeds[Math.floor(Math.random() * speeds.length)];
+                            const maxH = (s * s) / 20;
+
+                            q.question = `1. A ball is projected vertically upward from ground level with speed ${s} m/s. Calculate maximum height reached. (Take g = 10 m/s^2)`;
+                            q.options = [
+                                `A. ${maxH} m`,
+                                `B. ${maxH * 0.5} m`,
+                                `C. ${maxH * 2} m`,
+                                `D. ${maxH * 0.25} m`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 2) {
+                        try {
+                            const peDrops = [100, 150, 200, 250];
+                            const pe = peDrops[Math.floor(Math.random() * peDrops.length)];
+                            const keGains = [80, 120, 150, 200];
+                            const ke = keGains[Math.floor(Math.random() * keGains.length)];
+                            const finalKE = ke >= pe ? pe - 20 : ke;
+                            const loss = pe - finalKE;
+
+                            q.question = `3. A mass of 2.0 kg slides down an inclined plane releasing some energy. Its potential energy drop of ${pe} J is converted into kinetic energy of ${finalKE} J. How much energy is lost as frictional heat?`;
+                            q.options = [
+                                `A. ${loss} J`,
+                                `B. ${pe + finalKE} J`,
+                                `C. ${Math.round(pe / 2)} J`,
+                                `D. ${Math.round(finalKE / 2)} J`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 3) {
+                        try {
+                            const halfLives = [3, 4, 5];
+                            const hl = halfLives[Math.floor(Math.random() * halfLives.length)];
+                            const startMasses = [40, 60, 80, 120];
+                            const sm = startMasses[Math.floor(Math.random() * startMasses.length)];
+                            const decayPeriods = [3, 4];
+                            const totalTime = hl * decayPeriods[Math.floor(Math.random() * decayPeriods.length)];
+                            const remaining = sm / Math.pow(2, totalTime / hl);
+
+                            q.question = `4. A radioactive element has half-life of ${hl} hours. Starting with ${sm} g, calculate mass remaining after ${totalTime} hours.`;
+                            q.options = [
+                                `A. ${remaining} g`,
+                                `B. ${remaining * 2} g`,
+                                `C. ${remaining * 4} g`,
+                                `D. ${remaining / 2} g`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 6) {
+                        try {
+                            const sets = [
+                                { r: [2, 3, 6], ans: 1 },
+                                { r: [4, 12, 6], ans: 2 },
+                                { r: [3, 3, 3], ans: 1 },
+                                { r: [10, 10, 5], ans: 2.5 }
+                            ];
+                            const chosen = sets[Math.floor(Math.random() * sets.length)];
+
+                            q.question = `7. Three resistors of values ${chosen.r[0]} ohms, ${chosen.r[1]} ohms, and ${chosen.r[2]} ohms are connected in parallel. What is their equivalent resistance?`;
+                            q.options = [
+                                `A. ${chosen.ans} ohm`,
+                                `B. ${chosen.ans * 2} ohms`,
+                                `C. ${chosen.ans + 3} ohms`,
+                                `D. ${chosen.ans / 2} ohms`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    } else if (idx === 7) {
+                        try {
+                            const indices = [1.5, 1.33, 1.6];
+                            const n = indices[Math.floor(Math.random() * indices.length)];
+                            let realDep, appDep;
+                            if (n === 1.5) { realDep = 6.0; appDep = 4.0; }
+                            else if (n === 1.33) { realDep = 8.0; appDep = 6.0; }
+                            else { realDep = 8.0; appDep = 5.0; }
+
+                            q.question = `8. Calculate the refractive index of a glass block where real depth is ${realDep.toFixed(1)} cm and apparent depth under microscope view is ${appDep.toFixed(1)} cm.`;
+                            q.options = [
+                                `A. ${(realDep / appDep).toFixed(2).replace(/\.00$/, '')}`,
+                                `B. ${(appDep / realDep).toFixed(2).replace(/\.00$/, '')}`,
+                                `C. ${(realDep * appDep / 10).toFixed(2).replace(/\.00$/, '')}`,
+                                `D. ${(realDep - appDep).toFixed(2).replace(/\.00$/, '')}`
+                            ];
+                            q.correct = 0;
+                        } catch (e) { console.error(e); }
+                    }
+                }
+                
+                shuffleOptions(q);
+            });
+            
+            return questions;
+        }
+
+        function shuffleOptions(questionObj) {
+            let rawOptions = questionObj.options.map(opt => {
+                if (opt.startsWith('A. ') || opt.startsWith('B. ') || opt.startsWith('C. ') || opt.startsWith('D. ')) {
+                    return opt.substring(3);
+                }
+                if (opt.startsWith('*B. ')) {
+                    return opt.substring(4);
+                }
+                return opt;
+            });
+
+            const correctText = rawOptions[questionObj.correct];
+
+            for (let i = rawOptions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [rawOptions[i], rawOptions[j]] = [rawOptions[j], rawOptions[i]];
+            }
+
+            const newCorrectIndex = rawOptions.indexOf(correctText);
+            const prefixes = ['A. ', 'B. ', 'C. ', 'D. '];
+            questionObj.options = rawOptions.map((opt, idx) => prefixes[idx] + opt);
+            questionObj.correct = newCorrectIndex !== -1 ? newCorrectIndex : 0;
+        }
 
         // Simplified Scoring System
         class QuizScorer {
@@ -4952,6 +5813,8 @@ Analyze the question with maximum intelligence and provide the most contextually
         window.currentPlayingAudio = null;
         
         function playSound(url, questionIndex = currentQuestionIndex) {
+            // Sound effects are disabled per user request
+            return;
             try {
                 if (!url) return;
                 

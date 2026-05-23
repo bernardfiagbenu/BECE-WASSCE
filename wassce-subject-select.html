@@ -20,6 +20,11 @@
         }
     </script>
     <style>
+        /* Monochromatic black and white light theme */
+        html:not(.dark) {
+            filter: grayscale(100%) contrast(105%);
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -120,121 +125,39 @@
                     </p>
                 </div>
                 
+                <!-- Category Tabs / Filter Buttons -->
+                <div class="flex overflow-x-auto pb-4 mb-8 gap-2 scrollbar-none max-w-5xl mx-auto border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 sm:-mx-0 sm:px-0">
+                    <button onclick="filterGroup('All')" id="btn-All" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-[#0056D2] text-white shadow-sm transition-all duration-200">
+                        All Subjects
+                    </button>
+                    <button onclick="filterGroup('Core')" id="btn-Core" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        Core Subjects
+                    </button>
+                    <button onclick="filterGroup('General Science')" id="btn-GeneralScience" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        General Science
+                    </button>
+                    <button onclick="filterGroup('General Arts')" id="btn-GeneralArts" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        General Arts
+                    </button>
+                    <button onclick="filterGroup('Business')" id="btn-Business" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        Business
+                    </button>
+                    <button onclick="filterGroup('Home Economics')" id="btn-HomeEconomics" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        Home Economics
+                    </button>
+                    <button onclick="filterGroup('Visual Arts')" id="btn-VisualArts" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        Visual Arts
+                    </button>
+                    <button onclick="filterGroup('Agriculture')" id="btn-Agriculture" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        Agriculture
+                    </button>
+                    <button onclick="filterGroup('Technical')" id="btn-Technical" class="filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">
+                        Technical
+                    </button>
+                </div>
+                
                 <!-- Subject Selection Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                    <!-- Mathematics -->
-                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-blue-500" onclick="selectSubject('Mathematics')">
-                        <div class="text-center">
-                            <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-7 h-7 text-[#0056D2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Mathematics</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Numbers, algebra geometry, complex formulas, and structured solutions.</p>
-                            <div class="flex items-center justify-center text-[#0056D2]">
-                                <span class="text-xs font-semibold">Select Mathematics</span>
-                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Physics -->
-                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-emerald-500" onclick="selectSubject('Physics')">
-                        <div class="text-center">
-                            <div class="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Physics</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Motion mechanics, electric forces, thermodynamic concepts, and waves.</p>
-                            <div class="flex items-center justify-center text-emerald-600">
-                                <span class="text-xs font-semibold">Select Physics</span>
-                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chemistry -->
-                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-yellow-500" onclick="selectSubject('Chemistry')">
-                        <div class="text-center">
-                            <div class="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Chemistry</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Periodic elements, organic compounds, reaction metrics, and laboratory experiments.</p>
-                            <div class="flex items-center justify-center text-yellow-600">
-                                <span class="text-xs font-semibold">Select Chemistry</span>
-                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Biology -->
-                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-teal-500" onclick="selectSubject('Biology')">
-                        <div class="text-center">
-                            <div class="w-14 h-14 bg-teal-50 dark:bg-teal-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Biology</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Cell mitosis, genetic variations, ecology cycles, and anatomy structures.</p>
-                            <div class="flex items-center justify-center text-teal-600">
-                                <span class="text-xs font-semibold">Select Biology</span>
-                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- English Language -->
-                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-purple-500" onclick="selectSubject('English Language')">
-                        <div class="text-center">
-                            <div class="w-14 h-14 bg-purple-50 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">English Language</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Grammar structure, advanced comprehensions, essay models, and literature.</p>
-                            <div class="flex items-center justify-center text-purple-600">
-                                <span class="text-xs font-semibold">Select English</span>
-                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Computing -->
-                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-orange-500" onclick="selectSubject('Computing')">
-                        <div class="text-center">
-                            <div class="w-14 h-14 bg-orange-50 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Computing</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Logics, database systems, networking concepts, and computing architectures.</p>
-                            <div class="flex items-center justify-center text-orange-600">
-                                <span class="text-xs font-semibold">Select Computing</span>
-                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                <div id="subjects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 </div>
                 
                 <!-- Navigation Buttons -->
@@ -275,6 +198,199 @@
     </div>
 
     <script>
+        // Full WASSCE Subjects and program pathways list
+        const wassceSubjects = [
+            // Core
+            { id: 'Core Mathematics', name: 'Core Mathematics', group: 'Core', desc: 'Numbers, algebra, vectors, geometry, complex formulas, and structured solutions.', color: 'blue' },
+            { id: 'English Language', name: 'English Language', group: 'Core', desc: 'Grammar structure, advanced comprehensions, concord agreement, and literature concepts.', color: 'purple' },
+            { id: 'Integrated Science', name: 'Integrated Science', group: 'Core', desc: 'Fundamental science principles covering physics, chemistry, biology, and agricultural themes.', color: 'emerald' },
+            { id: 'Social Studies', name: 'Social Studies', group: 'Core', desc: 'Citizen relationships, governance, environmental concerns, and national integration.', color: 'rose' },
+            
+            // General Science
+            { id: 'Physics', name: 'Physics', group: 'General Science', desc: 'Motion mechanics, electricity circuits, thermodynamics, half-life, and waves.', color: 'teal' },
+            { id: 'Chemistry', name: 'Chemistry', group: 'General Science', desc: 'Atomic structure, organic chemistry, reaction stoichiometry, and acid-base metrics.', color: 'yellow' },
+            { id: 'Biology', name: 'Biology', group: 'General Science', desc: 'Cell mitosis, inheritance patterns, ecology webs, and human organ functions.', color: 'green' },
+            { id: 'Elective Mathematics', name: 'Elective Mathematics', group: 'General Science', desc: 'Remainder theorem, advanced calculus, coordinate circles, and mechanics.', color: 'indigo' },
+            
+            // General Arts
+            { id: 'Literature-in-English', name: 'Literature-in-English', group: 'General Arts', desc: 'Literary devices, tragic hero drama structures, African prose, and sonnets analysis.', color: 'pink' },
+            { id: 'Government', name: 'Government', group: 'General Arts', desc: 'State theories, separation of powers, colonial systems, and IV Republic codes.', color: 'cyan' },
+            { id: 'History', name: 'History', group: 'General Arts', desc: 'West African empires, slave trade impacts, Ghana nationalist struggle, and modern coups.', color: 'orange' },
+            { id: 'Christian/Islamic Religious Studies (CRS/IRS)', name: 'CRS / IRS', group: 'General Arts', desc: 'Spiritual call structures, Quranic revelations, Hadiths, and shared ethics guidelines.', color: 'fuchsia' },
+            { id: 'Economics', name: 'Economics', group: 'General Arts', desc: 'Price elasticity, law of returns, national income GDP, and central bank policies.', color: 'indigo' },
+            { id: 'Geography', name: 'Geography', group: 'General Arts', desc: 'Map scaling contours, rock cycles, industrial locations, and regional climates.', color: 'sky' },
+            { id: 'French', name: 'French', group: 'General Arts', desc: 'Subjunctive French conjugations, preposition genders, and direct/indirect pronouns.', color: 'violet' },
+            
+            // Business
+            { id: 'Accounting', name: 'Accounting', group: 'Business', desc: 'Double entries, trial balances, depreciation calculations, and asset ratios.', color: 'emerald' },
+            { id: 'Business Management', name: 'Business Management', group: 'Business', desc: 'Forms of ownership, marketing 4-Ps mix, administrative structures, and contract law.', color: 'amber' },
+            { id: 'Cost Accounting', name: 'Cost Accounting', group: 'Business', desc: 'Direct cost elements, piece rates, LIFO/FIFO inventories, and breakeven graphs.', color: 'red' },
+            
+            // Home Economics
+            { id: 'Food and Nutrition', name: 'Food and Nutrition', group: 'Home Economics', desc: 'Nutritional biochemistry, food poisoning prevention, and kitchen safety guides.', color: 'rose' },
+            { id: 'Management in Living', name: 'Management in Living', group: 'Home Economics', desc: 'Household budgeting, child cognitive stages, interior design, and first aid.', color: 'orange' },
+            { id: 'Clothing and Textiles', name: 'Clothing and Textiles', group: 'Home Economics', desc: 'Natural and synthetic fibers, weaving layouts, seam styles, and wardrobe plans.', color: 'violet' },
+            
+            // Visual Arts
+            { id: 'Graphic Design', name: 'Graphic Design', group: 'Visual Arts', desc: 'Branding models, digital graphics printing systems, RGB/CMYK, and typography.', color: 'purple' },
+            { id: 'General Knowledge in Art', name: 'General Knowledge in Art', group: 'Visual Arts', desc: 'Art movements, indigenous Ghanaian kente craftmanship, and exhibit mounting.', color: 'amber' },
+            { id: 'Textiles', name: 'Textiles', group: 'Visual Arts', desc: 'Tie-dye resisting folds, batik wax prints, silk screens, and loom weaving parts.', color: 'blue' },
+            { id: 'Picture Making', name: 'Picture Making', group: 'Visual Arts', desc: 'Tonal shading, rule of thirds compositions, drypoints, and mural frescoes.', color: 'emerald' },
+            { id: 'Sculpture', name: 'Sculpture', group: 'Visual Arts', desc: 'Clay wedgings, wood chisel works, plaster casting molds, and outdoor relief patinas.', color: 'stone' },
+            
+            // Agriculture
+            { id: 'General Agriculture', name: 'General Agriculture', group: 'Agriculture', desc: 'Land tenure policies, soil physical properties, and agricultural extensions.', color: 'green' },
+            { id: 'Crop Husbandry', name: 'Crop Husbandry', group: 'Agriculture', desc: 'Nursery bed preparation, crop rotation rotations, and cocoa black pod controls.', color: 'lime' },
+            { id: 'Animal Husbandry', name: 'Animal Husbandry', group: 'Agriculture', desc: 'Ruminant digestion paths, poultry layouts, tick vaccine controls, and breeding selection.', color: 'amber' },
+            
+            // Technical
+            { id: 'Applied Electricity', name: 'Applied Electricity', group: 'Technical', desc: 'AC circuits variables, transformer ratios, diode bridges, and grounding wire codes.', color: 'yellow' },
+            { id: 'Technical Drawing', name: 'Technical Drawing', group: 'Technical', desc: 'Orthographic projections, auxiliary scales, CAD layouts, and blueprint symbols.', color: 'indigo' },
+            { id: 'Woodwork', name: 'Woodwork', group: 'Technical', desc: 'Timber sapwood structure, kiln seasoning, mortise frames, and upholstery.', color: 'amber' },
+            { id: 'Metalwork', name: 'Metalwork', group: 'Technical', desc: 'Steel tempering, micrometer dials, lathe profiles, arc welding safety settings.', color: 'zinc' },
+            { id: 'Building Construction', name: 'Building Construction', group: 'Technical', desc: 'Raft foundation loads, concrete ratios, plaster screeds, and roof timber trusses.', color: 'red' }
+        ];
+
+        let activeGroup = 'All';
+
+        function filterGroup(group) {
+            activeGroup = group;
+            
+            // Highlight active button
+            const buttons = document.querySelectorAll('.filter-tab-btn');
+            buttons.forEach(btn => {
+                const normalizedBtnId = 'btn-' + group.replace(/\s+/g, '').replace(/\//g, '');
+                if (btn.id === normalizedBtnId) {
+                    btn.className = "filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-[#0056D2] text-white shadow-sm transition-all duration-200";
+                } else {
+                    btn.className = "filter-tab-btn shrink-0 px-4 py-2 text-sm font-semibold rounded-full bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200";
+                }
+            });
+
+            renderSubjectCards();
+        }
+
+        function getSubjectColors(colName) {
+            const mappings = {
+                blue: {
+                    border: 'blue-500', bg: 'blue-50', bgDark: 'blue-900/10', text: 'blue-600',
+                    icon: `<svg class="w-7 h-7 text-[#0056D2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>`
+                },
+                purple: {
+                    border: 'purple-500', bg: 'purple-50', bgDark: 'purple-900/10', text: 'purple-600',
+                    icon: `<svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>`
+                },
+                emerald: {
+                    border: 'emerald-500', bg: 'emerald-50', bgDark: 'emerald-900/10', text: 'emerald-600',
+                    icon: `<svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>`
+                },
+                rose: {
+                    border: 'rose-500', bg: 'rose-50', bgDark: 'rose-900/10', text: 'rose-600',
+                    icon: `<svg class="w-7 h-7 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>`
+                },
+                teal: {
+                    border: 'teal-500', bg: 'teal-50', bgDark: 'teal-900/10', text: 'teal-600',
+                    icon: `<svg class="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>`
+                },
+                yellow: {
+                    border: 'yellow-500', bg: 'yellow-50', bgDark: 'yellow-900/10', text: 'yellow-600',
+                    icon: `<svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>`
+                },
+                green: {
+                    border: 'green-500', bg: 'green-50', bgDark: 'green-900/10', text: 'green-600',
+                    icon: `<svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>`
+                },
+                indigo: {
+                    border: 'indigo-500', bg: 'indigo-50', bgDark: 'indigo-900/10', text: 'indigo-600',
+                    icon: `<svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 .364l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>`
+                },
+                pink: {
+                    border: 'pink-500', bg: 'pink-50', bgDark: 'pink-900/10', text: 'pink-600',
+                    icon: `<svg class="w-7 h-7 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`
+                },
+                cyan: {
+                    border: 'cyan-500', bg: 'cyan-50', bgDark: 'cyan-900/10', text: 'cyan-600',
+                    icon: `<svg class="w-7 h-7 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>`
+                },
+                orange: {
+                    border: 'orange-500', bg: 'orange-50', bgDark: 'orange-900/10', text: 'orange-600',
+                    icon: `<svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                },
+                fuchsia: {
+                    border: 'fuchsia-500', bg: 'fuchsia-50', bgDark: 'fuchsia-900/10', text: 'fuchsia-600',
+                    icon: `<svg class="w-7 h-7 text-fuchsia-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`
+                },
+                sky: {
+                    border: 'sky-500', bg: 'sky-50', bgDark: 'sky-900/10', text: 'sky-600',
+                    icon: `<svg class="w-7 h-7 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5a2.5 2.5 0 012.5 2.5v1.5a2 2 0 002 2h.5m-4.3 1.15a9.002 9.002 0 11-11.21-11.21"></path></svg>`
+                },
+                violet: {
+                    border: 'violet-500', bg: 'violet-50', bgDark: 'violet-900/10', text: 'violet-600',
+                    icon: `<svg class="w-7 h-7 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>`
+                },
+                amber: {
+                    border: 'amber-500', bg: 'amber-50', bgDark: 'amber-900/10', text: 'amber-600',
+                    icon: `<svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>`
+                },
+                red: {
+                    border: 'red-500', bg: 'red-50', bgDark: 'red-900/10', text: 'red-600',
+                    icon: `<svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>`
+                },
+                lime: {
+                    border: 'lime-500', bg: 'lime-50', bgDark: 'lime-900/10', text: 'lime-600',
+                    icon: `<svg class="w-7 h-7 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`
+                },
+                stone: {
+                    border: 'stone-500', bg: 'stone-100', bgDark: 'stone-800/10', text: 'stone-600',
+                    icon: `<svg class="w-7 h-7 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`
+                },
+                zinc: {
+                    border: 'zinc-500', bg: 'zinc-100', bgDark: 'zinc-800/10', text: 'zinc-600',
+                    icon: `<svg class="w-7 h-7 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>`
+                }
+            };
+            return mappings[colName] || mappings.blue;
+        }
+
+        function renderSubjectCards() {
+            const container = document.getElementById('subjects-grid');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const filtered = activeGroup === 'All' 
+                ? wassceSubjects 
+                : wassceSubjects.filter(s => s.group === activeGroup);
+                
+            filtered.forEach(subject => {
+                const colorColors = getSubjectColors(subject.color);
+                
+                const card = document.createElement('div');
+                card.id = `card-${subject.id.replace(/\s+/g, '').replace(/\//g, '')}`;
+                card.className = `subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-${colorColors.border} transition-all duration-300 flex flex-col justify-between`;
+                card.onclick = () => selectSubject(subject.id);
+                
+                card.innerHTML = `
+                    <div class="text-center h-full flex flex-col justify-between">
+                        <div>
+                            <div class="w-14 h-14 bg-${colorColors.bg} dark:bg-${colorColors.bgDark} rounded-full flex items-center justify-center mx-auto mb-4">
+                                ${colorColors.icon}
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-805 dark:text-white mb-1.5">${subject.name}</h3>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden leading-relaxed" title="${subject.desc}">${subject.desc}</p>
+                        </div>
+                        <div class="flex items-center justify-center text-${colorColors.text} text-xs font-semibold hover:opacity-80 mt-auto">
+                            <span>Start Practice</span>
+                            <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         // Ensure robust guest User Session at very first load
         function ensureGuestCredentials() {
             let userData = localStorage.getItem('userData');
@@ -368,6 +484,7 @@
             initTheme();
             ensureGuestCredentials();
             displaySelectedYear();
+            renderSubjectCards();
             
             // Theme toggle
             const themeToggle = document.getElementById('theme-toggle');
@@ -380,7 +497,7 @@
     <!-- Realtime Rankings Ticker (Firebase) -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, collection, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBPQxZvBmsJQ4kGxnWWBPs1pwRZnB8i3VE",
@@ -392,7 +509,9 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
 
         const tickerA = document.getElementById('ticker-track-a');
         const tickerB = document.getElementById('ticker-track-b');

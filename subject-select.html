@@ -20,6 +20,11 @@
         }
     </script>
     <style>
+        /* Monochromatic black and white light theme */
+        html:not(.dark) {
+            filter: grayscale(100%) contrast(105%);
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -197,6 +202,83 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Social Studies -->
+                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-red-500" onclick="selectSubject('Social Studies')">
+                        <div class="text-center">
+                            <div class="w-14 h-14 bg-red-50 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5A1.5 1.5 0 0018 10.5V8.5a.5.5 0 00-.5-.5h-1a1 1 0 01-1-1V5.5A2.5 2.5 0 0118 3m-6 11.235V14a1 1 0 011-1h1.5a1 1 0 001-1v-2h2.5a.5.5 0 01.5.5v3.13a2.91 2.91 0 01-.754 1.997l-1.082 1.218A1.99 1.99 0 0113 21h-1.5a1.5 1.5 0 01-1.5-1.5v-.235"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Social Studies</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Ghanaian culture, state institutions, environment preservation, and global relations.</p>
+                            <div class="flex items-center justify-center text-red-600">
+                                <span class="text-xs font-semibold">Select Social Studies</span>
+                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Career Technology -->
+                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-yellow-600" onclick="selectSubject('Career Technology')">
+                        <div class="text-center">
+                            <div class="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Career Technology</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Technical drawings, safe workshop practices, materials, and clothing designs.</p>
+                            <div class="flex items-center justify-center text-yellow-600">
+                                <span class="text-xs font-semibold">Select Career Tech</span>
+                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Religious and Moral Education (RME) -->
+                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-indigo-500" onclick="selectSubject('Religious and Moral Education (RME)')">
+                        <div class="text-center">
+                            <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Religious & Moral Ed</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Christianity, Islam, Traditional religion, moral ethics, and social disciplines.</p>
+                            <div class="flex items-center justify-center text-indigo-600">
+                                <span class="text-xs font-semibold">Select RME</span>
+                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Creative Arts and Design -->
+                    <div class="subject-card bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 cursor-pointer hover:border-pink-500" onclick="selectSubject('Creative Arts and Design')">
+                        <div class="text-center">
+                            <div class="w-14 h-14 bg-pink-50 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-7 h-7 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Creative Arts & Design</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 h-12 overflow-hidden">Primary colors, still life drawings, kente patterns, drama, and rhythm timings.</p>
+                            <div class="flex items-center justify-center text-pink-600">
+                                <span class="text-xs font-semibold">Select Creative Arts</span>
+                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Navigation Buttons -->
@@ -342,7 +424,7 @@
     <!-- Realtime Rankings Ticker (Firebase) -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, collection, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBPQxZvBmsJQ4kGxnWWBPs1pwRZnB8i3VE",
@@ -354,7 +436,9 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
 
         const tickerA = document.getElementById('ticker-track-a');
         const tickerB = document.getElementById('ticker-track-b');

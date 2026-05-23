@@ -20,6 +20,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     
     <style>
+        /* Monochromatic black and white light theme */
+        html:not(.dark) {
+            filter: grayscale(100%) contrast(105%);
+        }
+        
         body { 
             font-family: 'Inter', sans-serif; 
             transition: all 0.3s ease;
